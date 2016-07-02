@@ -40,7 +40,7 @@ namespace BlakeTest
 			Blake2SRandomSampleTest();
 			OnProgress("Passed 1000 rounds of Blake2S random sample comparisons..");
 			Blake2SPRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake2SP random sample comparisons..");
+			OnProgress("Passed 1000 rounds of Blake2SP random sample comparisons..");/**/
 
 			return SUCCESS;
 		}
@@ -186,15 +186,20 @@ namespace BlakeTest
 
 		for (size_t i = 0; i < 1000; ++i)
 		{
-			uint16_t blkSize = 512;
+			uint16_t blkSize = 0;
+			// get a random block size
+			memcpy(&blkSize, &rnd.GetBytes(2)[0], 2);
+			if (blkSize == 0)
+				++blkSize;
+			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
-
-			Blake2::BlakeB512 blake2b(true);
-			blake2b.ComputeHash(input, hash1);
 
 			blake2bp_init(S, 64);
 			blake2bp_update(S, input.data(), input.size());
 			blake2bp_final(S, hash2.data(), hash2.size());
+
+			Blake2::BlakeB512 blake2b(true);
+			blake2b.ComputeHash(input, hash1);
 
 			if (hash1 != hash2)
 				throw std::string("Blake2BPTest: Random sample test has failed!");
@@ -332,7 +337,12 @@ namespace BlakeTest
 
 		for (size_t i = 0; i < 1000; ++i)
 		{
-			uint16_t blkSize = 512;
+			uint16_t blkSize = 0;
+			// get a random block size
+			memcpy(&blkSize, &rnd.GetBytes(2)[0], 2);
+			if (blkSize == 0)
+				++blkSize;
+			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
 			Blake2::BlakeS256 blake2s(true);

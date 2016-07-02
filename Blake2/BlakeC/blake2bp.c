@@ -132,17 +132,6 @@ int blake2bp_update( blake2bp_state *S, const uint8_t *in, uint64_t inlen )
     left = 0;
   }
 
-// Note: If I am reading this right..
-// 1) input offset += parallel iterator * block size
-// 2) while length >= 4 * 128..
-// 3) update(s, offset, block size)
-// 4) input offset += 4 * 128
-// 5) input length -= 4 * 128
-// Doesn't this limit this to an input block size of just 512 bytes?
-// What happens if block is 1024, 2048..? 
-// If input offset is fixed at n * 128 bytes, and block of greater than 512 chosen, then while loop will overlap..
-// parallel loop creation is expensive, if I am right, this is a severe performance limitation
-
 #if defined(_OPENMP)
   #pragma omp parallel shared(S), num_threads(PARALLELISM_DEGREE)
 #else
@@ -154,7 +143,7 @@ int blake2bp_update( blake2bp_state *S, const uint8_t *in, uint64_t inlen )
 #endif
     uint64_t inlen__ = inlen;
     const uint8_t *in__ = ( const uint8_t * )in;
-    in__ += id__ * BLAKE2B_BLOCKBYTES; // limits it to degree * block size? shouldn't it be: in__ = inlen / PARALLELISM_DEGREE; in__ -= in__ % BLAKE2B_BLOCKBYTES;
+    in__ += id__ * BLAKE2B_BLOCKBYTES;
 
     while( inlen__ >= PARALLELISM_DEGREE * BLAKE2B_BLOCKBYTES )
     {
@@ -178,7 +167,7 @@ int blake2bp_update( blake2bp_state *S, const uint8_t *in, uint64_t inlen )
 int blake2bp_final( blake2bp_state *S, uint8_t *out, const uint8_t outlen )
 {
   uint8_t hash[PARALLELISM_DEGREE][BLAKE2B_OUTBYTES];
-  //127..087, 114..278, 102..096, 227..482
+
   for( size_t i = 0; i < PARALLELISM_DEGREE; ++i )
   {
     if( S->buflen > i * BLAKE2B_BLOCKBYTES )
@@ -265,11 +254,11 @@ int blake2bp( uint8_t *out, const void *in, const void *key, uint8_t outlen, uin
       blake2b_update( S[id__], in__, len );
     }
 
-    blake2b_final( S[id__], hash[id__], BLAKE2B_OUTBYTES );//183..034, 107..548, 361..424, 131..455
+    blake2b_final( S[id__], hash[id__], BLAKE2B_OUTBYTES );
   }
 
   // dofinal
-  if( blake2bp_init_root( FS, outlen, keylen ) < 0 ) //depth 2, nodedepth 1
+  if( blake2bp_init_root( FS, outlen, keylen ) < 0 )
     return -1;
 
   FS->last_node = 1; // Mark as last node

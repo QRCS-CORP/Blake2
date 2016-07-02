@@ -392,7 +392,7 @@ namespace Blake2
 		void Increment(std::vector<uint8_t> &Counter);
 		void Initialize(Blake2Tree &TreeParams, Blake2bState &State);
 		void ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, size_t Length);
-		void ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, size_t Length);
+		void ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, uint64_t Length);
 	};
 }
 #endif

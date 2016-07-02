@@ -33,7 +33,8 @@ namespace Blake2
 				// empty the message buffer
 				ParallelUtils::ParallelFor(0, m_treeParams.ThreadDepth(), [this, &Input, InOffset](size_t i)
 				{
-					ProcessLeaf(m_msgBuffer, i * BLOCK_SIZE, m_State[i], BLOCK_SIZE * 2);
+					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], BLOCK_SIZE);
+					ProcessBlock(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.ThreadDepth() * BLOCK_SIZE), m_State[i], BLOCK_SIZE);
 				});
 
 				// loop in the remainder (no buffering)
@@ -44,12 +45,12 @@ namespace Blake2
 					if (prcLen % m_minParallel != 0)
 						prcLen -= (prcLen % m_minParallel);
 
-					const size_t BLKLEN = prcLen / m_treeParams.ThreadDepth();
+					//const size_t BLKLEN = prcLen / m_treeParams.ThreadDepth();
 
 					// process large blocks
-					ParallelUtils::ParallelFor(0, m_treeParams.ThreadDepth(), [this, &Input, InOffset, BLKLEN](size_t i)
+					ParallelUtils::ParallelFor(0, m_treeParams.ThreadDepth(), [this, &Input, InOffset, prcLen](size_t i)
 					{
-						ProcessLeaf(Input, InOffset + (i * BLKLEN), m_State[i], BLKLEN);
+						ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_State[i], prcLen);
 					});
 
 					Length -= prcLen;
@@ -96,14 +97,11 @@ namespace Blake2
 				Length -= rmd;
 			}
 
-			if (Length > BLOCK_SIZE)
+			while (Length > BLOCK_SIZE)
 			{
-				size_t blkLen = Length - Length % BLOCK_SIZE;
-				if (Length % BLOCK_SIZE == 0)
-					blkLen -= BLOCK_SIZE;
-				ProcessLeaf(Input, InOffset, m_State[0], blkLen);
-				InOffset += blkLen;
-				Length -= blkLen;
+				ProcessBlock(Input, InOffset, m_State[0], BLOCK_SIZE);
+				InOffset += BLOCK_SIZE;
+				Length -= BLOCK_SIZE;
 			}
 		}
 
@@ -154,7 +152,9 @@ namespace Blake2
 			if (m_msgLength < m_msgBuffer.size())
 				memset(&m_msgBuffer[m_msgLength], 0, m_msgBuffer.size() - m_msgLength);
 
-			size_t prtBlk = 0;
+			std::vector<uint8_t> padLen(m_treeParams.ThreadDepth(), BLOCK_SIZE);
+			uint32_t prtBlk = UL_MAX;
+
 			// process unaligned blocks
 			if (m_msgLength > m_minParallel)
 			{
@@ -166,13 +166,15 @@ namespace Blake2
 				{
 					// process partial block set
 					ProcessBlock(m_msgBuffer, (i * BLOCK_SIZE), m_State[i], BLOCK_SIZE);
-					// swap blocks
 					memcpy(&m_msgBuffer[i * BLOCK_SIZE], &m_msgBuffer[m_minParallel + (i * BLOCK_SIZE)], BLOCK_SIZE);
 					m_msgLength -= BLOCK_SIZE;
 				}
-				// store partial block index
-				prtBlk = blkCount - 1;
+				if (m_msgLength % BLOCK_SIZE != 0)
+					prtBlk = blkCount - 1;
 			}
+
+			int32_t mlen = m_msgLength;
+			size_t blkSze = BLOCK_SIZE;
 
 			// process last 4 blocks
 			for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
@@ -184,15 +186,29 @@ namespace Blake2
 				if (i == m_treeParams.ThreadDepth() - 1)
 					m_State[i].F[1] = UL_MAX;
 
-				if (i != prtBlk)
+				if (i == prtBlk)
 				{
-					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], BLOCK_SIZE);
+					blkSze = m_msgLength % BLOCK_SIZE;
+					mlen += BLOCK_SIZE - blkSze;
+					memset(&m_msgBuffer[(i * BLOCK_SIZE) + blkSze], 0, BLOCK_SIZE - blkSze);
+				}
+				else if (mlen < 1)
+				{
+					blkSze = 0;
+					memset(&m_msgBuffer[i * BLOCK_SIZE], 0, BLOCK_SIZE);
+				}
+				else if (mlen < BLOCK_SIZE)
+				{
+					blkSze = mlen;
+					memset(&m_msgBuffer[(i * BLOCK_SIZE) + blkSze], 0, BLOCK_SIZE - blkSze);
 				}
 				else
 				{
-					size_t fnlSze = m_msgLength % BLOCK_SIZE == 0 ? BLOCK_SIZE : m_msgLength % BLOCK_SIZE;
-					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], fnlSze);
+					blkSze = BLOCK_SIZE;
 				}
+
+				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], blkSze);
+				mlen -= BLOCK_SIZE;
 
 				IntUtils::Le256ToBlock(m_State[i].H, hashCodes, i * DIGEST_SIZE);
 			}
@@ -209,7 +225,9 @@ namespace Blake2
 				BlockUpdate(hashCodes, i * DIGEST_SIZE, DIGEST_SIZE);
 
 			// compress all but last block
-			ProcessLeaf(m_msgBuffer, 0, m_State[0], m_msgLength - BLOCK_SIZE);
+			for (size_t i = 0; i < hashCodes.size() - BLOCK_SIZE; i += BLOCK_SIZE)
+				ProcessBlock(m_msgBuffer, i, m_State[0], BLOCK_SIZE);
+
 			// apply f0 and f1 flags
 			m_State[0].F[0] = UL_MAX;
 			m_State[0].F[1] = UL_MAX;
@@ -433,15 +451,15 @@ namespace Blake2
 		BlakeSCompress::Compress32(Input, InOffset, State, m_cIV);
 	}
 
-	void BlakeS256::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2sState &State, size_t Length)
+	void BlakeS256::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2sState &State, uint64_t Length)
 	{
 		do
 		{
 			ProcessBlock(Input, InOffset, State, BLOCK_SIZE);
-			InOffset += BLOCK_SIZE;
-			Length -= BLOCK_SIZE;
+			InOffset += m_minParallel;
+			Length -= m_minParallel;
 		} 
-		while (Length != 0);
+		while (Length > 0);
 	}
 
 }
