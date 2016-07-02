@@ -138,7 +138,6 @@
     <ClInclude Include="..\..\..\Blake2\Blake2Tree.h" />
     <ClInclude Include="..\..\..\Blake2\BlakeB512.h" />
     <ClInclude Include="..\..\..\Blake2\BlakeBCompress.h" />
-    <ClInclude Include="..\..\..\Blake2\BlakeConfig.h" />
     <ClInclude Include="..\..\..\Blake2\BlakeS256.h" />
     <ClInclude Include="..\..\..\Blake2\BlakeSCompress.h" />
     <ClInclude Include="..\..\..\Blake2\Common.h" />

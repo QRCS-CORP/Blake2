@@ -42,9 +42,6 @@
     <ClInclude Include="..\..\..\Blake2\Blake2Tree.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\BlakeConfig.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Blake2\BlakeS256.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>

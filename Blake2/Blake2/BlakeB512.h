@@ -281,11 +281,14 @@ namespace Blake2
 #if defined(_DEBUG)
 				assert(TreeParams.LeafLength() < BLOCK_SIZE || TreeParams.LeafLength() % BLOCK_SIZE != 0);
 				assert(TreeParams.ThreadDepth() < 2 || TreeParams.ThreadDepth() % 2 != 0);
-				/*if (TreeParams.LeafLength() < BLOCK_SIZE || TreeParams.LeafLength() % BLOCK_SIZE != 0)
+#endif
+#if defined(CPP_EXCEPTIONS)
+				if (TreeParams.LeafLength() < BLOCK_SIZE || TreeParams.LeafLength() % BLOCK_SIZE != 0)
 					throw CryptoDigestException("BlakeBP512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
 				if (TreeParams.ThreadDepth() < 2 || TreeParams.ThreadDepth() % 2 != 0)
-					throw CryptoDigestException("BlakeBP512:Ctor", "The ThreadDepth parameter is invalid! Must be an even number greater than 1.");*/
+					throw CryptoDigestException("BlakeBP512:Ctor", "The ThreadDepth parameter is invalid! Must be an even number greater than 1.");
 #endif
+
 				m_minParallel = m_treeParams.ThreadDepth() * BLOCK_SIZE;
 				m_State.resize(m_treeParams.ThreadDepth());
 				m_msgBuffer.resize((m_treeParams.ThreadDepth() * BLOCK_SIZE) * 2);

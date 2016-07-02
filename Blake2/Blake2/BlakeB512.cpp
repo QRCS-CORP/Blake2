@@ -14,11 +14,6 @@ namespace Blake2
 
 		if (m_isParallel)
 		{
-#if defined(_DEBUG)
-			assert(Length > m_parallelBlockSize);
-			/*if (Length > m_parallelBlockSize)
-				throw CryptoDigestException("BlakeBP512:BlockUpdate", "The Length size is invalid; Length can not exceed the ParallelBlockSize.");*/
-#endif
 			size_t ttlLen = Length + m_msgLength;
 			const size_t minPrl = m_msgBuffer.size() + (m_minParallel - BLOCK_SIZE);
 
@@ -242,15 +237,17 @@ namespace Blake2
 	size_t BlakeB512::Generate(MacParams &MacKey, std::vector<uint8_t> &Output)
 	{
 #if defined(_DEBUG)
-		assert(Output.size() == 0);
-		assert(MacKey.Key().size() < DIGEST_SIZE);
-		assert((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) > BLOCK_SIZE);
-		/*(if (Output.size() == 0)
+		assert(Output.size() != 0);
+		assert(MacKey.Key().size() >= DIGEST_SIZE);
+		assert((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) <= BLOCK_SIZE);
+#endif
+#if defined(CPP_EXCEPTIONS)
+		if (Output.size() == 0)
 			throw CryptoDigestException("BlakeB512:Generate", "Buffer size must be at least 1 uint8_t!");
 		if (MacKey.Key().size() < DIGEST_SIZE)
 			throw CryptoDigestException("BlakeB512:Generate", "The key must be at least 64 bytes long!");
 		if ((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) > BLOCK_SIZE)
-			throw CryptoDigestException("BlakeB512:Generate", "The maximum combined key (key + salt + info) input size is 128 bytes!");*/
+			throw CryptoDigestException("BlakeB512:Generate", "The maximum combined key (key + salt + info) input size is 128 bytes!");
 #endif
 
 		size_t bufSize = DIGEST_SIZE;
@@ -258,10 +255,8 @@ namespace Blake2
 
 		// add the key to state
 		LoadMacKey(MacKey);
-		// increment the input counter
-		Increment(inpCtr);
-		// process the key and first block
-		ProcessBlock(inpCtr, 0, m_State[0], BLOCK_SIZE);
+		// process the key
+		ProcessBlock(m_msgBuffer, 0, m_State[0], BLOCK_SIZE);
 		// copy hash to upper half of input
 		memcpy(&inpCtr[DIGEST_SIZE], &m_State[0].H[0], DIGEST_SIZE);
 		// add padding to empty bytes; hamming const 'ipad'
@@ -307,17 +302,23 @@ namespace Blake2
 	void BlakeB512::LoadMacKey(MacParams &MacKey)
 	{
 #if defined(_DEBUG)
-		assert(MacKey.Key().size() < 32 || MacKey.Key().size() > 64);
-		/*if (MacKey.Key().size() < 32 || MacKey.Key().size() > 64)
-			throw CryptoDigestException("BlakeB512", "Mac Key has invalid length!");*/
+		assert(MacKey.Key().size() >= 32 || MacKey.Key().size() <= 64);
 #endif
+#if defined(CPP_EXCEPTIONS)
+		if (MacKey.Key().size() < 32 || MacKey.Key().size() > 64)
+			throw CryptoDigestException("BlakeB512", "Mac Key has invalid length!");
+#endif
+
 		if (MacKey.Salt().size() != 0)
 		{
 #if defined(_DEBUG)
-			assert(MacKey.Salt().size() != 16);
-			/*if (MacKey.Salt().size() != 16)
-				throw CryptoDigestException("BlakeB512", "Salt has invalid length!");*/
+			assert(MacKey.Salt().size() == 16);
 #endif
+#if defined(CPP_EXCEPTIONS)
+			if (MacKey.Salt().size() != 16)
+				throw CryptoDigestException("BlakeB512", "Salt has invalid length!");
+#endif
+
 			m_treeConfig[4] = IntUtils::BytesToLe64(MacKey.Salt(), 0);
 			m_treeConfig[5] = IntUtils::BytesToLe64(MacKey.Salt(), 8);
 		}
@@ -325,10 +326,13 @@ namespace Blake2
 		if (MacKey.Info().size() != 0)
 		{
 #if defined(_DEBUG)
-			assert(MacKey.Info().size() != 16);
-			/*if (MacKey.Info().size() != 16)
-				throw CryptoDigestException("BlakeB512", "Info has invalid length!");*/
+			assert(MacKey.Info().size() == 16);
 #endif
+#if defined(CPP_EXCEPTIONS)
+			if (MacKey.Info().size() != 16)
+				throw CryptoDigestException("BlakeB512", "Info has invalid length!");
+#endif
+
 			m_treeConfig[6] = IntUtils::BytesToLe64(MacKey.Info(), 0);
 			m_treeConfig[7] = IntUtils::BytesToLe64(MacKey.Info(), 8);
 		}

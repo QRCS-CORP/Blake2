@@ -21,4 +21,6 @@
 #endif
 
 #define IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
+
+#define CPP_EXCEPTIONS
 // *** end temp definitions
