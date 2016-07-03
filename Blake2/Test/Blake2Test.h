@@ -8,7 +8,7 @@ namespace BlakeTest
 	/// <summary>
 	/// Tests the Blake2 digest implementation using vector comparisons.
 	/// <para>Tests all vectors from the official Blake2 submission:
-	/// <see href="https://github.com/BLAKE2/BLAKE2/tree/master/testvectors"/>
+	/// <see href="https://github.com/BLAKE2/BLAKE2/tree/master/testvectors"/></para>
 	/// </summary>
 	class Blake2Test : public ITest
 	{

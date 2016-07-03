@@ -109,7 +109,8 @@ namespace Blake2
 		static constexpr uint32_t BLOCK_SIZE = 64;
 		static constexpr uint32_t CHAIN_SIZE = 8;
 		static constexpr uint32_t COUNTER_SIZE = 2;
-		const uint32_t DEF_LEAFSIZE = 4096;
+		static constexpr uint32_t PARALLEL_DEG = 8;
+		const uint32_t DEF_LEAFSIZE = 16384;
 		const size_t DIGEST_SIZE = 32;
 		const uint32_t FLAG_SIZE = 2;
 		const uint32_t MAX_PRLBLOCK = 5120000;
@@ -141,9 +142,9 @@ namespace Blake2
 			{
 				if (F.size() > 0)
 					memset(&F[0], 0, F.size() * sizeof(uint32_t));
-				if (F.size() > 0)
+				if (H.size() > 0)
 					memset(&H[0], 0, H.size() * sizeof(uint32_t));
-				if (F.size() > 0)
+				if (T.size() > 0)
 					memset(&T[0], 0, T.size() * sizeof(uint32_t));
 			}
 		};
@@ -188,7 +189,7 @@ namespace Blake2
 		/// <summary>
 		/// Get: Parallel block size; set either automatically, or through the constructors Blake2Tree ThreadCount() parameter. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 		/// </summary>
-		size_t &ParallelBlockSize() { return m_parallelBlockSize; }
+		const size_t ParallelBlockSize() { return m_parallelBlockSize; }
 
 		/// <summary>
 		/// Get: Maximum input size with parallel processing
@@ -216,12 +217,12 @@ namespace Blake2
 			:
 			m_isDestroyed(false),
 			m_isParallel(Parallel),
-			m_leafSize(BLOCK_SIZE),
+			m_leafSize(Parallel ? DEF_LEAFSIZE : BLOCK_SIZE),
 			m_minParallel(0),
-			m_msgBuffer(BLOCK_SIZE),
+			m_msgBuffer(Parallel ? 2 * PARALLEL_DEG * BLOCK_SIZE : BLOCK_SIZE),
 			m_msgLength(0),
-			m_State(1),
-			m_treeConfig(8),
+			m_State(Parallel ? 8 : 1),
+			m_treeConfig(CHAIN_SIZE),
 			m_treeDestroy(true)
 		{
 			if (m_isParallel)
@@ -229,21 +230,11 @@ namespace Blake2
 				// sets defaults of depth 2, fanout 8, 8 threads
 				m_treeParams = { (uint8_t)DIGEST_SIZE, 0, 8, 2, 0, 0, 0, (uint8_t)DIGEST_SIZE, 8 };
 				// minimum block size
-				m_minParallel = m_treeParams.ThreadDepth() * BLOCK_SIZE;
-				// size state array to thread count
-				m_State.resize(m_treeParams.ThreadDepth());
-				// size the buffer as twice the minimum parallel block
-				m_msgBuffer.resize(m_minParallel * 2);
-				m_leafSize = DEF_LEAFSIZE;
-				// default parallel input block expected is Pn * 4096 bytes
-				m_parallelBlockSize = m_leafSize * m_treeParams.ThreadDepth();
+				m_minParallel = PARALLEL_DEG * BLOCK_SIZE;
+				// default parallel input block expected is Pn * 16384 bytes
+				m_parallelBlockSize = m_leafSize * PARALLEL_DEG;
 				// initialize the leaf nodes 
-				for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
-				{
-					m_treeParams.NodeOffset() = i;
-					Initialize(m_treeParams, m_State[i]);
-				}
-				m_treeParams.NodeOffset() = 0;
+				Reset();
 			}
 			else
 			{
@@ -260,9 +251,9 @@ namespace Blake2
 		/// <remarks>
 		/// <para>Setting the TreeConfig::FanOut() to greater than 1 initializes the Blake2SP digest configuration (parallel mode), when set to false initializes the default Blake2S configuration.
 		/// Note that the two different algorithms (BlakeS and BlakeSP) will return different hash codes (this is expected, use one or the other).
-		/// The default sequential mode Blake2Tree configuration settings are : treeParams = { (uint8_t)DIGEST_SIZE, 0, 1, 1, 0, 0, 0, 0, 0 };
+		/// The default sequential mode Blake2Tree configuration settings are : treeParams = { (uint8_t)DIGEST_SIZE, 0, 1, 1, 0, 0, 0, 0, 1 };
 		/// The default parallel mode Blake2Tree configuration settings are : treeParams = { (uint8_t)DIGEST_SIZE, 0, 4, 2, 0, 0, 0, (uint8_t)DIGEST_SIZE, 8 };.
-		/// See the TreeParams documentation for details on flags and configuration settings.</para>
+		/// See the Blake2Tree documentation for details on flags and configuration settings.</para>
 		/// </remarks>
 		/// 
 		/// <param name="TreeParams">A Blake2Tree structure containing the Tree Hash configuration settings.</param>
@@ -272,10 +263,10 @@ namespace Blake2
 			m_isParallel(false),
 			m_leafSize(BLOCK_SIZE),
 			m_minParallel(0),
-			m_msgBuffer(BLOCK_SIZE),
+			m_msgBuffer(TreeParams.ThreadDepth() > 0 ? 2 * TreeParams.ThreadDepth() * BLOCK_SIZE: BLOCK_SIZE),
 			m_msgLength(0),
-			m_State(1),
-			m_treeConfig(8),
+			m_State(TreeParams.ThreadDepth() > 0 ? TreeParams.ThreadDepth() : 1),
+			m_treeConfig(CHAIN_SIZE),
 			m_treeDestroy(false),
 			m_treeParams(TreeParams)
 		{
@@ -288,21 +279,17 @@ namespace Blake2
 				assert(TreeParams.ThreadDepth() > 2 || TreeParams.ThreadDepth() % 2 == 0);
 #endif
 #if defined(CPP_EXCEPTIONS)
-				if (TreeParams.LeafLength() < BLOCK_SIZE || TreeParams.LeafLength() % BLOCK_SIZE != 0)
+				if (TreeParams.LeafLength() != 0 && (TreeParams.LeafLength() < BLOCK_SIZE || TreeParams.LeafLength() % BLOCK_SIZE != 0))
 					throw CryptoDigestException("BlakeSP256:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
 				if (TreeParams.ThreadDepth() < 2 || TreeParams.ThreadDepth() % 2 != 0)
 					throw CryptoDigestException("BlakeSP256:Ctor", "The ThreadDepth parameter is invalid! Must be an even number greater than 1.");
 #endif
 
 				m_minParallel = m_treeParams.ThreadDepth() * BLOCK_SIZE;
-				m_State.resize(m_treeParams.ThreadDepth());
-				m_msgBuffer.resize((m_treeParams.ThreadDepth() * BLOCK_SIZE) * 2);
 				m_leafSize = TreeParams.LeafLength() == 0 ? DEF_LEAFSIZE : TreeParams.LeafLength();
 				// set parallel block size as Pn * leaf size 
-				m_parallelBlockSize = m_leafSize * TreeParams.LeafLength();
-
-				for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
-					Initialize(m_treeParams, m_State[i]);
+				m_parallelBlockSize = TreeParams.ThreadDepth() * m_leafSize;
+				Reset();
 			}
 			else
 			{

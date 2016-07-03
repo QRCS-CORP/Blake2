@@ -375,7 +375,7 @@ int blake2b_final( blake2b_state *S, uint8_t *out, uint8_t outlen )
   blake2b_increment_counter( S, S->buflen );
   blake2b_set_lastblock( S ); 
   memset( S->buf + S->buflen, 0, 2 * BLAKE2B_BLOCKBYTES - S->buflen ); /* Padding */
-  blake2b_compress( S, S->buf ); //115,495 to 459,554
+  blake2b_compress( S, S->buf );
   memcpy( out, &S->h[0], outlen );
   return 0;
 }

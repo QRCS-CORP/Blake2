@@ -346,7 +346,6 @@ namespace BlakeTest
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
 			Blake2::BlakeS256 blake2s(true);
-			blake2s.ParallelBlockSize() = blkSize;
 			blake2s.ComputeHash(input, hash1);
 
 			blake2sp_init(S, 32);

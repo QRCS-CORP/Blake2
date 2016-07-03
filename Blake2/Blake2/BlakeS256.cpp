@@ -38,14 +38,12 @@ namespace Blake2
 				});
 
 				// loop in the remainder (no buffering)
-				if (Length > minPrl)
+				if ((int64_t)Length > minPrl)
 				{
 					// calculate working set size
 					size_t prcLen = Length - m_minParallel;
 					if (prcLen % m_minParallel != 0)
 						prcLen -= (prcLen % m_minParallel);
-
-					//const size_t BLKLEN = prcLen / m_treeParams.ThreadDepth();
 
 					// process large blocks
 					ParallelUtils::ParallelFor(0, m_treeParams.ThreadDepth(), [this, &Input, InOffset, prcLen](size_t i)
@@ -97,6 +95,7 @@ namespace Blake2
 				Length -= rmd;
 			}
 
+			// loop until last block
 			while (Length > BLOCK_SIZE)
 			{
 				ProcessBlock(Input, InOffset, m_State[0], BLOCK_SIZE);
@@ -170,17 +169,15 @@ namespace Blake2
 					m_msgLength -= BLOCK_SIZE;
 				}
 				if (m_msgLength % BLOCK_SIZE != 0)
-					prtBlk = blkCount - 1;
+					prtBlk = (uint32_t)blkCount - 1;
 			}
-
-			int32_t mlen = m_msgLength;
-			size_t blkSze = BLOCK_SIZE;
 
 			// process last 4 blocks
 			for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
 			{
 				// apply f0 bit reversal constant to final blocks
 				m_State[i].F[0] = UL_MAX;
+				size_t blkSze = BLOCK_SIZE;
 
 				// f1 constant on last block
 				if (i == m_treeParams.ThreadDepth() - 1)
@@ -189,26 +186,22 @@ namespace Blake2
 				if (i == prtBlk)
 				{
 					blkSze = m_msgLength % BLOCK_SIZE;
-					mlen += BLOCK_SIZE - blkSze;
+					m_msgLength += BLOCK_SIZE - blkSze;
 					memset(&m_msgBuffer[(i * BLOCK_SIZE) + blkSze], 0, BLOCK_SIZE - blkSze);
 				}
-				else if (mlen < 1)
+				else if ((int32_t)m_msgLength < 1)
 				{
 					blkSze = 0;
 					memset(&m_msgBuffer[i * BLOCK_SIZE], 0, BLOCK_SIZE);
 				}
-				else if (mlen < BLOCK_SIZE)
+				else if ((int32_t)m_msgLength < BLOCK_SIZE)
 				{
-					blkSze = mlen;
+					blkSze = m_msgLength;
 					memset(&m_msgBuffer[(i * BLOCK_SIZE) + blkSze], 0, BLOCK_SIZE - blkSze);
-				}
-				else
-				{
-					blkSze = BLOCK_SIZE;
 				}
 
 				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], blkSze);
-				mlen -= BLOCK_SIZE;
+				m_msgLength -= BLOCK_SIZE;
 
 				IntUtils::Le256ToBlock(m_State[i].H, hashCodes, i * DIGEST_SIZE);
 			}

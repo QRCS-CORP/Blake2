@@ -1,3 +1,4 @@
+#include <sstream> 
 #include "Blake2Test.h"
 #include "DigestSpeedTest.h"
 #include "ConsoleUtils.h"
@@ -12,6 +13,13 @@ std::string GetResponse()
 	std::getline(std::cin, resp);
 
 	return resp;
+}
+
+int StringToInt(const std::string Text)
+{
+	std::istringstream ss(Text);
+	int result;
+	return ss >> result ? result : 0;
 }
 
 bool CanTest(std::string Message)
@@ -88,17 +96,25 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	RunTest(new Blake2Test());
+
 	try
 	{
 		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");
 		PrintHeader("", "");
 
+		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
+		{
+			RunTest(new Blake2Test());
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("Diagnostic test was Cancelled..");
+		}
+		ConsoleUtils::WriteLine("");
+
 		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
 		{
-			// unrem to get better avg. sampling
-			//for(size_t i = 0; i < 10; ++i)
-			RunTest(new DigestSpeedTest());
+			RunTest(new DigestSpeedTest(0));
 		}
 		else
 		{
@@ -107,27 +123,40 @@ int main()
 		ConsoleUtils::WriteLine("");
 
 
-		if (CanTest("Press 'Y' then Enter to run a C/C++ version comparison test on 100GB, any other key to cancel: "))
+		if (CanTest("Press 'Y' then Enter to run extended C/C++ version comparison test on 20GB, any other key to cancel: "))
 		{
-			RunTest(new DigestSpeedTest(true));
+			RunTest(new DigestSpeedTest(1));
 		}
 		else
 		{
-			ConsoleUtils::WriteLine("Speed comparison test was Cancelled..");
+			ConsoleUtils::WriteLine("Extended Speed test was Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");
 
-
-		if (!CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
+		if (CanTest("Press 'Y' then Enter to run user defined Parallel Degree Test, any other key to cancel: "))
 		{
-			ConsoleUtils::WriteLine("Completed! Press any key to close..");
-			GetResponse();
-			return 0;
+			PrintHeader("Enter the Parallel Degree: must be greater than and divisible by 4 (4, 8, 12, 16, 20, 24, 28, 32");
+			int thds = 0;
+			do
+			{
+				std::string resp;
+				std::getline(std::cin, resp);
+				thds = StringToInt(resp);
+				if (thds < 4 || thds % 4 != 0 || thds > 32)
+				{
+					thds = 0;
+					PrintHeader("Enter the Parallel Degree: must be greater than and divisible by 4 (ex 4,8,12,16..");
+				}
+			} 
+			while (thds == 0);
+
+			RunTest(new DigestSpeedTest(thds));
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("Custom Parallel Degree test was Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");
-
-		PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-		RunTest(new Blake2Test());
 
 
 		PrintHeader("Completed! Press any key to close..", "");

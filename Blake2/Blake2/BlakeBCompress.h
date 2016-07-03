@@ -23,7 +23,6 @@
 #	include <spe.h>
 #endif
 
-
 namespace Blake2
 {
 	class BlakeBCompress

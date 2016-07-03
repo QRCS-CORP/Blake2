@@ -23,7 +23,7 @@ namespace BlakeTest
 		static constexpr uint64_t GB10 = GB1 * 10;
 		static constexpr uint64_t DEFITER = 10;
 
-		bool m_largeAvg;
+		int m_testCycle;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -38,13 +38,13 @@ namespace BlakeTest
 		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
-		/// Progress return event callback
+		/// Test Blake2 for performance
 		/// </summary>
 		///
-		/// <param name="LargeAvg">Enable extended parallel test to 10GB of sample size</param>
-		DigestSpeedTest(bool LargeAvg = false)
+		/// <param name="TestCycle">The type of speed test to run; standard(0), long(1), or extended parallel degree (4 or greater, must be divisible by 4)</param>
+		DigestSpeedTest(int TestCycle = 0)
 			:
-			m_largeAvg(LargeAvg)
+			m_testCycle(TestCycle)
 		{
 		}
 
@@ -55,12 +55,13 @@ namespace BlakeTest
 		{
 			try
 			{
-				if (m_largeAvg)
+				if (m_testCycle == 0)
 				{
 					OnProgress("*** TEST PARAMETERS ***");
 					OnProgress("Blake2B, Blake2BP, Blake2S, and Blake2SP are all tested for performance.");
 					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
 					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
+					OnProgress("Block update sizes are fixed at 250MB times 4 iterations per 1GB loop cycle.");
 					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
 					OnProgress("The second run uses the CEX C++ version of the algorithms.");
 					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
@@ -72,26 +73,41 @@ namespace BlakeTest
 					OnProgress("### CEX C++ BLAKE2BP Message Digest: 20 loops * 1000 MB ###");
 					CppBlake2BLoop(GB1, 20, true);
 				}
-				else
+				else if (m_testCycle == 1)
 				{
 					OnProgress("*** TEST PARAMETERS ***");
 					OnProgress("Blake2B, Blake2BP, Blake2S, and Blake2SP are all tested for performance.");
 					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 1 GB.");
-					OnProgress("10 * 100MB loops are run and added for the combined average over 1 GigaByte of data.");
+					OnProgress("Block update sizes are fixed at 250MB times 4 iterations per 1GB loop cycle.");
+					OnProgress("10 * 1GB loops are run and added for the combined average over 10 GigaByte of data.");
 					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
 					OnProgress("The second run uses the CEX C++ version of the algorithms.");
 					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
 					OnProgress("");
 
-					OnProgress("### Blake2B Optimized C Sequential: 10 loops * 100 MB ###");
-					CBlake2BLoop(MB100);
-					OnProgress("### Blake2BP Optimized C Parallel: 10 loops * 100 MB ###");
-					CBlake2BPLoop(MB100);
+					OnProgress("### Blake2B Optimized C Sequential: 10 loops * 1000 MB ###");
+					CBlake2BLoop(GB1);
+					OnProgress("### Blake2BP Optimized C Parallel: 10 loops * 1000 MB ###");
+					CBlake2BPLoop(GB1);
 
-					OnProgress("### Blake2B-512 C++ Sequential: 10 loops * 100 MB ###");
-					CppBlake2BLoop(MB100, 10);
-					OnProgress("### Blake2BP-512 C++ Parallel: 10 loops * 100 MB ###");
-					CppBlake2BLoop(MB100, 10, true);
+					OnProgress("### Blake2B-512 C++ Sequential: 10 loops * 1000 MB ###");
+					CppBlake2BLoop(GB1, 10);
+					OnProgress("### Blake2BP-512 C++ Parallel: 10 loops * 1000 MB ###");
+					CppBlake2BLoop(GB1, 10, true);
+				}
+				else
+				{
+					OnProgress("*** TEST PARAMETERS ***");
+					OnProgress("Blake2B and Blake2BP are all tested for performance using a user defined Parallel Degree.");
+					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
+					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
+					OnProgress("Block update sizes are fixed at sample size divided by the requested Thread per each 1GB loop cycle.");
+					OnProgress("The second run uses the CEX C++ version of the algorithms.");
+					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
+					OnProgress("");
+
+					OnProgress("### Blake2B-512 C++ Sequential: 10 loops * 1000 MB ###");
+					CppBlake2BEx(GB1, m_testCycle, 20);
 				}
 
 				return MESSAGE;
@@ -110,6 +126,7 @@ namespace BlakeTest
 		void CBlake2BLoop(size_t SampleSize, size_t Loops = DEFITER);
 		void CBlake2BPLoop(size_t SampleSize, size_t Loops = DEFITER);
 		void CppBlake2BLoop(size_t SampleSize, size_t Loops = DEFITER, bool Parallel = false);
+		void CppBlake2BEx(size_t SampleSize, uint8_t Degree, size_t Loops = DEFITER);
 		uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void OnProgress(char* Data);
 

@@ -95,6 +95,7 @@ namespace Blake2
 				Length -= rmd;
 			}
 
+			// loop until last block
 			while (Length > BLOCK_SIZE)
 			{
 				ProcessBlock(Input, InOffset, m_State[0], BLOCK_SIZE);
@@ -167,18 +168,17 @@ namespace Blake2
 					memcpy(&m_msgBuffer[i * BLOCK_SIZE], &m_msgBuffer[m_minParallel + (i * BLOCK_SIZE)], BLOCK_SIZE);
 					m_msgLength -= BLOCK_SIZE;
 				}
+
 				if (m_msgLength % BLOCK_SIZE != 0)
 					prtBlk = blkCount - 1;
 			}
-
-			int32_t mlen = m_msgLength;
-			size_t blkSze = BLOCK_SIZE;
 
 			// process last 4 blocks
 			for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
 			{
 				// apply f0 bit reversal constant to final blocks
 				m_State[i].F[0] = ULL_MAX;
+				size_t blkSze = BLOCK_SIZE;
 
 				// f1 constant on last block
 				if (i == m_treeParams.ThreadDepth() - 1)
@@ -187,26 +187,22 @@ namespace Blake2
 				if (i == prtBlk)
 				{
 					blkSze = m_msgLength % BLOCK_SIZE;
-					mlen += BLOCK_SIZE - blkSze;
+					m_msgLength += BLOCK_SIZE - blkSze;
 					memset(&m_msgBuffer[(i * BLOCK_SIZE) + blkSze], 0, BLOCK_SIZE - blkSze);
 				}
-				else if (mlen < 1)
+				else if ((int32_t)m_msgLength < 1)
 				{
 					blkSze = 0;
 					memset(&m_msgBuffer[i * BLOCK_SIZE], 0, BLOCK_SIZE);
 				}
-				else if (mlen < BLOCK_SIZE)
+				else if ((int32_t)m_msgLength < BLOCK_SIZE)
 				{
-					blkSze = mlen;
+					blkSze = m_msgLength;
 					memset(&m_msgBuffer[(i * BLOCK_SIZE) + blkSze], 0, BLOCK_SIZE - blkSze);
-				}
-				else
-				{
-					blkSze = BLOCK_SIZE;
 				}
 
 				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], blkSze);
-				mlen -= BLOCK_SIZE;
+				m_msgLength -= BLOCK_SIZE;
 
 				IntUtils::Le512ToBlock(m_State[i].H, hashCodes, i * DIGEST_SIZE);
 			}
