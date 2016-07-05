@@ -110,10 +110,10 @@ namespace Blake2
 		static constexpr uint32_t CHAIN_SIZE = 8;
 		static constexpr uint32_t COUNTER_SIZE = 2;
 		static constexpr uint32_t PARALLEL_DEG = 4;
-		const uint32_t DEF_LEAFSIZE = 16384;
+		const uint32_t DEF_LEAFSIZE = 1024 * 1000 * 10;
 		const size_t DIGEST_SIZE = 64;
 		const uint32_t FLAG_SIZE = 2;
-		const uint32_t MAX_PRLBLOCK = 5120000;
+		const uint32_t MAX_PRLBLOCK = 1024 * 1000 * 400;
 		const uint32_t MIN_PRLBLOCK = 512;
 		const size_t ROUND_COUNT = 12;
 		const uint64_t ULL_MAX = 18446744073709551615;
@@ -359,7 +359,7 @@ namespace Blake2
 		/// Initialize the digest as a counter based DRBG
 		/// </summary>
 		/// 
-		/// <param name="MacKey">The input key parameters; the input Key must be a minimum of 64 bytes, maximum of combined Key, Salt, and Info, must be 128 bytes or less</param>
+		/// <param name="MacKey">The input key parameters; the input Key must be a minimum of 64 bytes</param>
 		/// <param name="Output">The psuedo random output</param>
 		/// 
 		/// <returns>The number of bytes generated</returns>

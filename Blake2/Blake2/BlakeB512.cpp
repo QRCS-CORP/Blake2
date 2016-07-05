@@ -152,7 +152,6 @@ namespace Blake2
 			if (m_msgLength < m_msgBuffer.size())
 				memset(&m_msgBuffer[m_msgLength], 0, m_msgBuffer.size() - m_msgLength);
 
-			std::vector<uint8_t> padLen(m_treeParams.ThreadDepth(), BLOCK_SIZE);
 			uint64_t prtBlk = ULL_MAX;
 
 			// process unaligned blocks
@@ -256,11 +255,9 @@ namespace Blake2
 #endif
 #if defined(CPP_EXCEPTIONS)
 		if (Output.size() == 0)
-			throw CryptoDigestException("Blake2Bp512:Generate", "Buffer size must be at least 1 uint8_t!");
+			throw CryptoDigestException("Blake2Bp512:Generate", "Buffer size must be at least 1 byte!");
 		if (MacKey.Key().size() < DIGEST_SIZE)
 			throw CryptoDigestException("Blake2Bp512:Generate", "The key must be at least 64 bytes long!");
-		if ((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) > BLOCK_SIZE)
-			throw CryptoDigestException("Blake2Bp512:Generate", "The maximum combined key (key + salt + info) input size is 128 bytes!");
 #endif
 
 		size_t bufSize = DIGEST_SIZE;
@@ -272,8 +269,8 @@ namespace Blake2
 		ProcessBlock(m_msgBuffer, 0, m_State[0], BLOCK_SIZE);
 		// copy hash to upper half of input
 		memcpy(&inpCtr[DIGEST_SIZE], &m_State[0].H[0], DIGEST_SIZE);
-		// add padding to empty bytes; hamming const 'ipad'
-		memset(&inpCtr[sizeof(uint32_t)], 0x36, DIGEST_SIZE - sizeof(uint32_t));
+		// add padding to empty bytes
+		memset(&inpCtr[sizeof(uint32_t)], 0x0, DIGEST_SIZE - sizeof(uint32_t));
 		// increment the input counter
 		Increment(inpCtr);
 		// process the block

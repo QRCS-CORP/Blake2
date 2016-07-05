@@ -28,11 +28,11 @@
     <Filter Include="Source Files\Test\DigestTest">
       <UniqueIdentifier>{284cdecb-018d-4169-a19e-db0e645abe30}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Test\Vectors">
-      <UniqueIdentifier>{8ffe9c6a-90b5-4f91-9f96-1c0ec792e368}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Blake2C">
       <UniqueIdentifier>{673b062a-5cd1-4dc7-b5c1-aee7d487e0b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Vectors">
+      <UniqueIdentifier>{8ffe9c6a-90b5-4f91-9f96-1c0ec792e368}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -83,16 +83,16 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Vectors\blake2b-kat.txt">
-      <Filter>Source Files\Test\Vectors</Filter>
+      <Filter>Header Files\Test\Vectors</Filter>
     </Text>
     <Text Include="Vectors\blake2bp-kat.txt">
-      <Filter>Source Files\Test\Vectors</Filter>
+      <Filter>Header Files\Test\Vectors</Filter>
     </Text>
     <Text Include="Vectors\blake2s-kat.txt">
-      <Filter>Source Files\Test\Vectors</Filter>
+      <Filter>Header Files\Test\Vectors</Filter>
     </Text>
     <Text Include="Vectors\blake2sp-kat.txt">
-      <Filter>Source Files\Test\Vectors</Filter>
+      <Filter>Header Files\Test\Vectors</Filter>
     </Text>
   </ItemGroup>
 </Project>

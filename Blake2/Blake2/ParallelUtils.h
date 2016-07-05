@@ -50,7 +50,6 @@ namespace Blake2
 			futures.clear();
 #endif
 		}
-
 	};
 }
 #endif

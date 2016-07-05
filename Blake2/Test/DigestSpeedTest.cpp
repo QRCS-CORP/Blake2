@@ -8,7 +8,7 @@ namespace BlakeTest
 	void DigestSpeedTest::CBlake2BLoop(size_t SampleSize, size_t Loops)
 	{
 		std::vector<uint8_t> hash(64, 0);
-		size_t bufLen = SampleSize / 4;
+		size_t bufLen = MB1;
 		std::vector<uint8_t> buffer(bufLen, 0);
 		std::vector<uint8_t> key(0, 0);
 		const char* name = "Blake2b";
@@ -85,7 +85,7 @@ namespace BlakeTest
 	void DigestSpeedTest::CppBlake2BLoop(size_t SampleSize, size_t Loops, bool Parallel)
 	{
 		Blake2::Blake2Bp512 dgt(Parallel);
-		size_t bufLen = SampleSize / 4;
+		size_t bufLen = Parallel ? SampleSize / 4 : MB1;
 		std::vector<uint8_t> hash(dgt.DigestSize(), 0);
 		std::vector<uint8_t> buffer(bufLen, 0);
 		const char* name = dgt.Name();
