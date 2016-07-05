@@ -33,7 +33,7 @@ namespace Blake2
 
 #if defined(HAS_INTRINSICS)
 #	if !defined(__XOP__)
-#		if defined(HAVE_SSSE3)
+#		if !defined(HAS_SSE3)
 #			define _mm_roti_epi64(x, c) \
 					(-(c) == 32) ? _mm_shuffle_epi32((x), _MM_SHUFFLE(2,3,0,1))  \
 					: (-(c) == 24) ? _mm_shuffle_epi8((x), r24) \

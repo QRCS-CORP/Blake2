@@ -42,8 +42,8 @@ namespace Blake2
 #		define TOI(reg) _mm_castps_si128((reg))
 #	endif
 
-#	ifndef HAS_XOP
-#		ifndef HAS_SSE3 // Note: shouldn't this be if defined?
+#	if !defined(HAS_XOP)
+#		if !defined(HAS_SSE3)
 #			define _mm_roti_epi32(r, c) ( \
                 (8==-(c)) ? _mm_shuffle_epi8(r,r8) \
               : (16==-(c)) ? _mm_shuffle_epi8(r,r16) \
