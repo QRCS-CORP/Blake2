@@ -5,8 +5,8 @@
 #include "HexConverter.h"
 #include "CSPRsg.h"
 
-#include "../Blake2/BlakeS256.h"
-#include "../Blake2/BlakeB512.h"
+#include "../Blake2/Blake2Sp256.h"
+#include "../Blake2/Blake2Bp512.h"
 #include "../Blake2/MacParams.h"
 #include "../BlakeC/blake2.h"
 
@@ -17,7 +17,7 @@ namespace BlakeTest
 		try
 		{
 			TreeParamsTest();
-			OnProgress("Passed Blake2Tree parameter serialization test..");
+			OnProgress("Passed Blake2Params parameter serialization test..");
 			MacParamsTest();
 			OnProgress("Passed MacParams cloning test..");
 			Blake2STest();
@@ -88,7 +88,7 @@ namespace BlakeTest
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Blake2::MacParams mkey(key);
-					Blake2::BlakeB512 blake2b(false);
+					Blake2::Blake2Bp512 blake2b(false);
 					blake2b.LoadMacKey(mkey);
 					blake2b.ComputeHash(input, hash);
 
@@ -134,7 +134,7 @@ namespace BlakeTest
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Blake2::BlakeB512 blake2(true);
+					Blake2::Blake2Bp512 blake2(true);
 					Blake2::MacParams mkey(key);
 					blake2.LoadMacKey(mkey);
 					blake2.ComputeHash(input, hash);
@@ -164,7 +164,7 @@ namespace BlakeTest
 			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
-			Blake2::BlakeB512 blake2b(false);
+			Blake2::Blake2Bp512 blake2b(false);
 			blake2b.ComputeHash(input, hash1);
 
 			blake2b_init(S, 64);
@@ -198,7 +198,7 @@ namespace BlakeTest
 			blake2bp_update(S, input.data(), input.size());
 			blake2bp_final(S, hash2.data(), hash2.size());
 
-			Blake2::BlakeB512 blake2b(true);
+			Blake2::Blake2Bp512 blake2b(true);
 			blake2b.ComputeHash(input, hash1);
 
 			if (hash1 != hash2)
@@ -240,7 +240,7 @@ namespace BlakeTest
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Blake2::MacParams mkey(key);
-					Blake2::BlakeS256 blake2s(false);
+					Blake2::Blake2Sp256 blake2s(false);
 					blake2s.LoadMacKey(mkey);
 					blake2s.ComputeHash(input, hash);
 
@@ -286,7 +286,7 @@ namespace BlakeTest
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Blake2::MacParams mkey(key);
-					Blake2::BlakeS256 blake2sp(true);
+					Blake2::Blake2Sp256 blake2sp(true);
 					blake2sp.LoadMacKey(mkey);
 					blake2sp.ComputeHash(input, hash);
 
@@ -315,7 +315,7 @@ namespace BlakeTest
 			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
-			Blake2::BlakeS256 blake2s(false);
+			Blake2::Blake2Sp256 blake2s(false);
 			blake2s.ComputeHash(input, hash1);
 
 			blake2s_init(S, 32);
@@ -345,7 +345,7 @@ namespace BlakeTest
 			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
-			Blake2::BlakeS256 blake2s(true);
+			Blake2::Blake2Sp256 blake2s(true);
 			blake2s.ComputeHash(input, hash1);
 
 			blake2sp_init(S, 32);
@@ -373,9 +373,9 @@ namespace BlakeTest
 
 	void Blake2Test::TreeParamsTest()
 	{
-		Blake2::Blake2Tree tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
+		Blake2::Blake2Params tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
 		std::vector<uint8_t> tres = tree1.ToBytes();
-		Blake2::Blake2Tree tree2(tres);
+		Blake2::Blake2Params tree2(tres);
 
 		if (!tree1.Equals(tree2))
 			throw std::string("Blake2STest: Tree parameters test failed!");

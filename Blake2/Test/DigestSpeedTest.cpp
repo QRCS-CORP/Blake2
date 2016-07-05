@@ -1,6 +1,6 @@
 #include "DigestSpeedTest.h"
 
-#include "../Blake2/BlakeB512.h"
+#include "../Blake2/Blake2Bp512.h"
 #include "../BlakeC/blake2.h"
 
 namespace BlakeTest
@@ -84,7 +84,7 @@ namespace BlakeTest
 
 	void DigestSpeedTest::CppBlake2BLoop(size_t SampleSize, size_t Loops, bool Parallel)
 	{
-		Blake2::BlakeB512 dgt(Parallel);
+		Blake2::Blake2Bp512 dgt(Parallel);
 		size_t bufLen = SampleSize / 4;
 		std::vector<uint8_t> hash(dgt.DigestSize(), 0);
 		std::vector<uint8_t> buffer(bufLen, 0);
@@ -121,8 +121,8 @@ namespace BlakeTest
 
 	void DigestSpeedTest::CppBlake2BEx(size_t SampleSize, uint8_t Degree, size_t Loops)
 	{
-		Blake2::Blake2Tree treeParams = { 64, 0, 4, 2, 0, 0, 0, 64, Degree };
-		Blake2::BlakeB512 dgt(treeParams);
+		Blake2::Blake2Params treeParams = { 64, 0, 4, 2, 0, 0, 0, 64, Degree };
+		Blake2::Blake2Bp512 dgt(treeParams);
 		size_t bufLen = SampleSize / treeParams.ThreadDepth();
 		std::vector<uint8_t> hash(dgt.DigestSize(), 0);
 		std::vector<uint8_t> buffer(bufLen, 0);

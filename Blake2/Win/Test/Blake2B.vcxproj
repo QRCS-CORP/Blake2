@@ -146,38 +146,28 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <OpenMPSupport>true</OpenMPSupport>
+      <OpenMPSupport>false</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>None</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
       <SDLCheck>false</SDLCheck>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\Blake2\Win\Test\Vectors;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\Blake2\Blake2;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\BlakeC\blake2-config.h" />
-    <ClInclude Include="..\..\BlakeC\blake2-impl.h" />
-    <ClInclude Include="..\..\BlakeC\blake2.h" />
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse2.h" />
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse41.h" />
-    <ClInclude Include="..\..\BlakeC\blake2b-round.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse2.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse41.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-load-xop.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-round.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
@@ -191,10 +181,6 @@
     <ClInclude Include="..\..\Test\TestUtils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\BlakeC\blake2b.c" />
-    <ClCompile Include="..\..\BlakeC\blake2bp.c" />
-    <ClCompile Include="..\..\BlakeC\blake2s.c" />
-    <ClCompile Include="..\..\BlakeC\blake2sp.c" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\Test.cpp" />
@@ -206,6 +192,9 @@
     <Text Include="Vectors\blake2sp-kat.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CBlake\CBlake.vcxproj">
+      <Project>{6d04c381-010b-437d-ac13-3f574aeed038}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Static\Blake2\Blake2.vcxproj">
       <Project>{f86bc665-f057-4111-bc21-54180d4c2353}</Project>
     </ProjectReference>

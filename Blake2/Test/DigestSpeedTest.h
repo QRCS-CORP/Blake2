@@ -58,25 +58,7 @@ namespace BlakeTest
 				if (m_testCycle == 0)
 				{
 					OnProgress("*** TEST PARAMETERS ***");
-					OnProgress("Blake2B, Blake2BP, Blake2S, and Blake2SP are all tested for performance.");
-					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
-					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
-					OnProgress("Block update sizes are fixed at 250MB times 4 iterations per 1GB loop cycle.");
-					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
-					OnProgress("The second run uses the CEX C++ version of the algorithms.");
-					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
-					OnProgress("");
-
-					OnProgress("### Original C version BLAKE2BP Message Digest: 20 loops * 1000 MB ###");
-					CBlake2BPLoop(GB1, 20);
-
-					OnProgress("### CEX C++ BLAKE2BP Message Digest: 20 loops * 1000 MB ###");
-					CppBlake2BLoop(GB1, 20, true);
-				}
-				else if (m_testCycle == 1)
-				{
-					OnProgress("*** TEST PARAMETERS ***");
-					OnProgress("Blake2B, Blake2BP, Blake2S, and Blake2SP are all tested for performance.");
+					OnProgress("Blake2B and Blake2BP are all tested for performance.");
 					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 1 GB.");
 					OnProgress("Block update sizes are fixed at 250MB times 4 iterations per 1GB loop cycle.");
 					OnProgress("10 * 1GB loops are run and added for the combined average over 10 GigaByte of data.");
@@ -94,6 +76,24 @@ namespace BlakeTest
 					CppBlake2BLoop(GB1, 10);
 					OnProgress("### Blake2BP-512 C++ Parallel: 10 loops * 1000 MB ###");
 					CppBlake2BLoop(GB1, 10, true);
+				}
+				else if (m_testCycle == 1)
+				{
+					OnProgress("*** TEST PARAMETERS ***");
+					OnProgress("Blake2B and Blake2BP are all tested for performance.");
+					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
+					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
+					OnProgress("Block update sizes are fixed at 250MB times 4 iterations per 1GB loop cycle.");
+					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
+					OnProgress("The second run uses the CEX C++ version of the algorithms.");
+					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
+					OnProgress("");
+
+					OnProgress("### Original C version BLAKE2BP Message Digest: 20 loops * 1000 MB ###");
+					CBlake2BPLoop(GB1, 20);
+
+					OnProgress("### CEX C++ BLAKE2BP Message Digest: 20 loops * 1000 MB ###");
+					CppBlake2BLoop(GB1, 20, true);
 				}
 				else
 				{

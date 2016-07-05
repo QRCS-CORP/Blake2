@@ -39,25 +39,25 @@
     <ClInclude Include="..\..\..\Blake2\MacParams.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\Blake2Tree.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\BlakeS256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\BlakeB512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\BlakeBCompress.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Blake2\ParallelUtils.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Blake2\IntUtils.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\BlakeSCompress.h">
+    <ClInclude Include="..\..\..\Blake2\Blake2Params.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake2Bp512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake2Sp256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake2BCompress.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake2SCompress.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
   </ItemGroup>

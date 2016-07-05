@@ -1,5 +1,5 @@
-#include "BlakeB512.h"
-#include "BlakeBCompress.h"
+#include "Blake2Bp512.h"
+#include "Blake2BCompress.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 
@@ -7,7 +7,7 @@ namespace Blake2
 {
 	// *** Public Methods *** //
 
-	void BlakeB512::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
+	void Blake2Bp512::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 	{
 		if (Length == 0)
 			return;
@@ -112,18 +112,19 @@ namespace Blake2
 		}
 	}
 
-	void BlakeB512::ComputeHash(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
+	void Blake2Bp512::ComputeHash(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 	{
 		BlockUpdate(Input, 0, Input.size());
 		DoFinal(Output, 0);
 		Reset();
 	}
 
-	void BlakeB512::Destroy()
+	void Blake2Bp512::Destroy()
 	{
 		if (!m_isDestroyed)
 		{
 			m_isDestroyed = true;
+			IntUtils::ClearVector(m_cIV);
 			IntUtils::ClearVector(m_msgBuffer);
 			IntUtils::ClearVector(m_treeConfig);
 
@@ -141,7 +142,7 @@ namespace Blake2
 		}
 	}
 
-	size_t BlakeB512::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset)
+	size_t Blake2Bp512::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset)
 	{
 		if (m_isParallel)
 		{
@@ -246,7 +247,7 @@ namespace Blake2
 		return DIGEST_SIZE;
 	}
 
-	size_t BlakeB512::Generate(MacParams &MacKey, std::vector<uint8_t> &Output)
+	size_t Blake2Bp512::Generate(MacParams &MacKey, std::vector<uint8_t> &Output)
 	{
 #if defined(_DEBUG)
 		assert(Output.size() != 0);
@@ -255,11 +256,11 @@ namespace Blake2
 #endif
 #if defined(CPP_EXCEPTIONS)
 		if (Output.size() == 0)
-			throw CryptoDigestException("BlakeB512:Generate", "Buffer size must be at least 1 uint8_t!");
+			throw CryptoDigestException("Blake2Bp512:Generate", "Buffer size must be at least 1 uint8_t!");
 		if (MacKey.Key().size() < DIGEST_SIZE)
-			throw CryptoDigestException("BlakeB512:Generate", "The key must be at least 64 bytes long!");
+			throw CryptoDigestException("Blake2Bp512:Generate", "The key must be at least 64 bytes long!");
 		if ((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) > BLOCK_SIZE)
-			throw CryptoDigestException("BlakeB512:Generate", "The maximum combined key (key + salt + info) input size is 128 bytes!");
+			throw CryptoDigestException("Blake2Bp512:Generate", "The maximum combined key (key + salt + info) input size is 128 bytes!");
 #endif
 
 		size_t bufSize = DIGEST_SIZE;
@@ -311,14 +312,14 @@ namespace Blake2
 		return Output.size();
 	}
 
-	void BlakeB512::LoadMacKey(MacParams &MacKey)
+	void Blake2Bp512::LoadMacKey(MacParams &MacKey)
 	{
 #if defined(_DEBUG)
 		assert(MacKey.Key().size() >= 32 || MacKey.Key().size() <= 64);
 #endif
 #if defined(CPP_EXCEPTIONS)
 		if (MacKey.Key().size() < 32 || MacKey.Key().size() > 64)
-			throw CryptoDigestException("BlakeB512", "Mac Key has invalid length!");
+			throw CryptoDigestException("Blake2Bp512", "Mac Key has invalid length!");
 #endif
 
 		if (MacKey.Salt().size() != 0)
@@ -328,7 +329,7 @@ namespace Blake2
 #endif
 #if defined(CPP_EXCEPTIONS)
 			if (MacKey.Salt().size() != 16)
-				throw CryptoDigestException("BlakeB512", "Salt has invalid length!");
+				throw CryptoDigestException("Blake2Bp512", "Salt has invalid length!");
 #endif
 
 			m_treeConfig[4] = IntUtils::BytesToLe64(MacKey.Salt(), 0);
@@ -342,7 +343,7 @@ namespace Blake2
 #endif
 #if defined(CPP_EXCEPTIONS)
 			if (MacKey.Info().size() != 16)
-				throw CryptoDigestException("BlakeB512", "Info has invalid length!");
+				throw CryptoDigestException("Blake2Bp512", "Info has invalid length!");
 #endif
 
 			m_treeConfig[6] = IntUtils::BytesToLe64(MacKey.Info(), 0);
@@ -373,7 +374,7 @@ namespace Blake2
 		}
 	}
 
-	void BlakeB512::Reset()
+	void Blake2Bp512::Reset()
 	{
 		m_msgLength = 0;
 		memset(&m_msgBuffer[0], 0, m_msgBuffer.size());
@@ -393,7 +394,7 @@ namespace Blake2
 		}
 	}
 
-	void BlakeB512::Update(uint8_t Input)
+	void Blake2Bp512::Update(uint8_t Input)
 	{
 		std::vector<uint8_t> inp(1, Input);
 		BlockUpdate(inp, 0, 1);
@@ -401,32 +402,32 @@ namespace Blake2
 
 	// *** Private Methods *** //
 
-	void BlakeB512::Increase(Blake2bState &State, uint64_t Length)
+	void Blake2Bp512::Increase(Blake2bState &State, uint64_t Length)
 	{
 		State.T[0] += Length;
 		if (State.T[0] < Length)
 			++State.T[1];
 	}
 
-	void BlakeB512::Increment(std::vector<uint8_t> &Counter)
+	void Blake2Bp512::Increment(std::vector<uint8_t> &Counter)
 	{
 		IntUtils::Le64ToBytes(IntUtils::BytesToLe64(Counter, 0) + 1, Counter, 0);
 	}
 
-	void BlakeB512::Initialize(Blake2Tree &TreeParams, Blake2bState &State)
+	void Blake2Bp512::Initialize(Blake2Params &Params, Blake2bState &State)
 	{
 		memset(&State.T[0], 0, COUNTER_SIZE * sizeof(uint64_t));
 		memset(&State.F[0], 0, FLAG_SIZE * sizeof(uint64_t));
 		memcpy(&State.H[0], &m_cIV[0], CHAIN_SIZE * sizeof(uint64_t));
 
-		m_treeConfig[0] = TreeParams.DigestLength();
-		m_treeConfig[0] |= TreeParams.KeyLength() << 8;
-		m_treeConfig[0] |= TreeParams.FanOut() << 16;
-		m_treeConfig[0] |= TreeParams.MaxDepth() << 24;
-		m_treeConfig[0] |= (uint64_t)TreeParams.LeafLength() << 32;
-		m_treeConfig[1] = TreeParams.NodeOffset();
-		m_treeConfig[2] = TreeParams.NodeDepth();
-		m_treeConfig[2] |= TreeParams.InnerLength() << 8;
+		m_treeConfig[0] = Params.DigestLength();
+		m_treeConfig[0] |= Params.KeyLength() << 8;
+		m_treeConfig[0] |= Params.FanOut() << 16;
+		m_treeConfig[0] |= Params.MaxDepth() << 24;
+		m_treeConfig[0] |= (uint64_t)Params.LeafLength() << 32;
+		m_treeConfig[1] = Params.NodeOffset();
+		m_treeConfig[2] = Params.NodeDepth();
+		m_treeConfig[2] |= Params.InnerLength() << 8;
 
 		State.H[0] ^= m_treeConfig[0];
 		State.H[1] ^= m_treeConfig[1];
@@ -438,13 +439,13 @@ namespace Blake2
 		State.H[7] ^= m_treeConfig[7];
 	}
 
-	void BlakeB512::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, size_t Length)
+	void Blake2Bp512::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, size_t Length)
 	{
 		Increase(State, Length);
-		BlakeBCompress::Compress64(Input, InOffset, State, m_cIV);
+		Blake2BCompress::Compress(Input, InOffset, State, m_cIV);
 	}
 
-	void BlakeB512::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, uint64_t Length)
+	void Blake2Bp512::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, uint64_t Length)
 	{
 		do
 		{

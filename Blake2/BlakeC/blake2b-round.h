@@ -155,6 +155,5 @@
   LOAD_MSG_ ##r ##_4(b0, b1); \
   G2(row1l,row2l,row3l,row4l,row1h,row2h,row3h,row4h,b0,b1); \
   UNDIAGONALIZE(row1l,row2l,row3l,row4l,row1h,row2h,row3h,row4h);
-
 #endif
 

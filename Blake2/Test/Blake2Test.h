@@ -63,7 +63,7 @@ namespace BlakeTest
 			std::vector<uint8_t> key(64);
 			std::vector<uint8_t> hash(64);
 			Blake2::MacParams mkey(key);
-			Blake2::BlakeB512 blake2b(true);
+			Blake2::Blake2Bp512 blake2b(true);
 
 			for (size_t i = 0; i < 256; ++i)
 			{
@@ -106,7 +106,7 @@ namespace BlakeTest
 				for (size_t i = 0; i < key.size(); ++i)
 					key[i] = i;
 				Blake2::MacParams mkey(key);
-				Blake2::BlakeS256 blake2S(false);
+				Blake2::Blake2Sp256 blake2S(false);
 				std::vector<uint8_t> rand(193);
 				blake2S.Generate(mkey, rand);
 			}
@@ -116,7 +116,7 @@ namespace BlakeTest
 				for (size_t i = 0; i < key.size(); ++i)
 					key[i] = i;
 				Blake2::MacParams mkey(key);
-				Blake2::BlakeB512 blake2B(false);
+				Blake2::Blake2Bp512 blake2B(false);
 				std::vector<uint8_t> rand2(187);
 				blake2B.Generate(mkey, rand2);
 			}

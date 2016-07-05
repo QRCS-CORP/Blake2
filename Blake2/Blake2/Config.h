@@ -26,4 +26,6 @@
 #define IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
 
 #define CPP_EXCEPTIONS
+
+#define LOADBLAKE3
 // *** end temp definitions

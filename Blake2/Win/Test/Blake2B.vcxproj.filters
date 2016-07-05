@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Blake2C">
-      <UniqueIdentifier>{01b21250-1881-4807-8bb2-43adf0a5b962}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Test">
       <UniqueIdentifier>{abaf60cf-f9f9-4ef2-964b-7d6ef905180e}</UniqueIdentifier>
     </Filter>
@@ -39,36 +36,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\BlakeC\blake2.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse2.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse41.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2b-round.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2-config.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2-impl.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse2.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse41.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-load-xop.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-round.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\ConsoleUtils.h">
       <Filter>Header Files\Test\Common</Filter>
     </ClInclude>
@@ -106,18 +73,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\Test\Test.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2b.c">
-      <Filter>Source Files\Blake2C</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2bp.c">
-      <Filter>Source Files\Blake2C</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2s.c">
-      <Filter>Source Files\Blake2C</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2sp.c">
-      <Filter>Source Files\Blake2C</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\Blake2Test.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>

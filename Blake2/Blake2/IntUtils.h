@@ -49,7 +49,8 @@ namespace Blake2
 			if (Obj.capacity() == 0)
 				return;
 
-			memset(Obj.data(), 0, Obj.capacity() * sizeof(T));
+			static void *(*const volatile memset_v)(void *, int, size_t) = &memset;
+			memset_v(Obj.data(), 0, Obj.size() * sizeof(T));
 			Obj.clear();
 		}
 
