@@ -3,7 +3,7 @@
 
 #include "Config.h"
 
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #	include <intrin.h>		// Microsoft C/C++-compatible compiler
 #elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__)) 
 #	include <x86intrin.h>	// GCC-compatible compiler, targeting x86/x86-64

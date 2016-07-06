@@ -12,7 +12,7 @@
    More information about the BLAKE2 hash function can be found at
    https://blake2.net.
 */
-
+//#define HAVE_AVX
 #ifndef __BLAKE2_CONFIG_H__
 #define __BLAKE2_CONFIG_H__
 
@@ -29,7 +29,7 @@
 #if defined(__SSE4_2__)
 #define HAVE_SSE41
 #endif
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(_M_AMD64) && _M_AMD64 >= 100
 #define HAVE_AVX
 #endif
 #if defined(__XOP__)
@@ -64,7 +64,7 @@
 #define HAVE_SSE2
 #endif
 
-#if defined(_MSC_VER) && !defined(HAS_SSE4) && !defined(HAS_SSSE3) && !defined(HAS_SSE2)
+#if defined(_MSC_VER) && !defined(HAS_SSE4) && !defined(HAS_SSSE3) && !defined(HAS_SSE2) && !defined(HAVE_XOP) && !defined(HAVE_AVX2) && !defined(HAVE_AVX)
 #	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
 #		define HAVE_SSSE3
 #		define HAVE_SSE2

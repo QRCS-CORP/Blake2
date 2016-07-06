@@ -15,7 +15,7 @@
 #if defined(__SSE4_2__)
 #	define HAS_SSE42
 #endif
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(_M_AMD64) && _M_AMD64 >= 100
 #	define HAS_AVX
 #endif
 #if defined(__XOP__)
@@ -50,7 +50,7 @@
 #	define HAS_SSE4
 #endif
 
-#if defined(_MSC_VER) && !defined(HAS_SSE4) && !defined(HAS_SSSE3) && !defined(HAS_SSE2)
+#if defined(_MSC_VER) && !defined(HAS_SSE4) && !defined(HAS_SSSE3) && !defined(HAS_SSE2) && !defined(HAVE_XOP) && !defined(HAVE_AVX2) && !defined(HAVE_AVX)
 #	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
 #		define HAS_SSSE3
 #		define HAS_SSE2
