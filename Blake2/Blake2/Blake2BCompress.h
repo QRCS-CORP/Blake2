@@ -1,29 +1,8 @@
-#ifndef _BLAKE2_BLAKEBCOMPRESS_H
-#define _BLAKE2_BLAKEBCOMPRESS_H
+#ifndef _BLAKE2_BLAKE2BCOMPRESS_H
+#define _BLAKE2_BLAKE2BCOMPRESS_H
 
+#include "Intrinsics.h"
 #include "IntUtils.h"
-
-#if defined(HAS_INTRINSICS)
-#	if defined(_MSC_VER) 
-	// Microsoft C/C++-compatible compiler
-#		include <intrin.h>
-#	elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__)) 
-	// GCC-compatible compiler, targeting x86/x86-64
-#		include <x86intrin.h>
-#	elif defined(__GNUC__) && defined(__ARM_NEON__) 
-	// GCC-compatible compiler, targeting ARM with NEON
-#		include <arm_neon.h>
-#	elif defined(__GNUC__) && defined(__IWMMXT__) 
-	// GCC-compatible compiler, targeting ARM with WMMX
-#		include <mmintrin.h>
-#	elif (defined(__GNUC__) || defined(__xlC__)) && (defined(__VEC__) || defined(__ALTIVEC__)) 
-	// XLC or GCC-compatible compiler, targeting PowerPC with VMX/VSX
-#		include <altivec.h>
-#	elif defined(__GNUC__) && defined(__SPE__) 
-	// GCC-compatible compiler, targeting PowerPC with SPE
-#		include <spe.h>
-#	endif
-#endif
 
 namespace Blake2
 {
@@ -31,9 +10,9 @@ namespace Blake2
 	{
 	public:
 
-#if defined(HAS_INTRINSICS)
-#	if !defined(__XOP__)
-#		if !defined(HAS_SSE3)
+#if defined(HAS_ADVINTRIN)
+#	if !defined(HAS_XOP)
+#		if defined(HAS_SSSE3)
 #			define _mm_roti_epi64(x, c) \
 					(-(c) == 32) ? _mm_shuffle_epi32((x), _MM_SHUFFLE(2,3,0,1))  \
 					: (-(c) == 24) ? _mm_shuffle_epi8((x), r24) \
@@ -45,7 +24,7 @@ namespace Blake2
 #		endif
 #	endif
 
-#	if defined(HAS_SSE3)
+#	if defined(HAS_SSSE3)
 #		define DIAGONALIZE(row1l,row2l,row3l,row4l,row1h,row2h,row3h,row4h) \
 			  t0 = _mm_alignr_epi8(row2h, row2l, 8); \
 			  t1 = _mm_alignr_epi8(row2l, row2h, 8); \
@@ -129,7 +108,7 @@ namespace Blake2
 			const uint64_t m14 = ((uint64_t*)block)[14];
 			const uint64_t m15 = ((uint64_t*)block)[15];
 #endif
-#if defined(HAS_SSE3) && !defined(__XOP__)
+#if defined(HAS_SSSE3) && !defined(HAS_XOP)
 			const __m128i r16 = _mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9);
 			const __m128i r24 = _mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10);
 #endif

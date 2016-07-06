@@ -60,7 +60,7 @@ namespace BlakeTest
 					OnProgress("*** TEST PARAMETERS ***");
 					OnProgress("Blake2B and Blake2BP are all tested for performance.");
 					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 1 GB.");
-					OnProgress("Block update sizes are fixed at 250MB times 4 iterations per 1GB loop cycle.");
+					OnProgress("Block update sizes are fixed at 10MB times 100 iterations per 1GB loop cycle.");
 					OnProgress("10 * 1GB loops are run and added for the combined average over 10 GigaByte of data.");
 					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
 					OnProgress("The second run uses the CEX C++ version of the algorithms.");
@@ -83,7 +83,7 @@ namespace BlakeTest
 					OnProgress("Blake2B and Blake2BP are all tested for performance.");
 					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
 					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
-					OnProgress("Block update sizes are fixed at 250MB times 4 iterations per 1GB loop cycle.");
+					OnProgress("Block update sizes are fixed at 10MB times 100 iterations per 1GB loop cycle.");
 					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
 					OnProgress("The second run uses the CEX C++ version of the algorithms.");
 					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
@@ -101,7 +101,7 @@ namespace BlakeTest
 					OnProgress("Blake2B and Blake2BP are all tested for performance using a user defined Parallel Degree.");
 					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
 					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
-					OnProgress("Block update sizes are fixed at sample size divided by the requested Thread per each 1GB loop cycle.");
+					OnProgress("Block update sizes are fixed at 10MB times 100 iterations per 1GB loop cycle.");
 					OnProgress("The second run uses the CEX C++ version of the algorithms.");
 					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
 					OnProgress("");

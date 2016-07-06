@@ -60,6 +60,9 @@
     <ClInclude Include="..\..\..\Blake2\Blake2SCompress.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Intrinsics.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Blake2\BlakeB512.cpp">

@@ -8,7 +8,7 @@ namespace BlakeTest
 	void DigestSpeedTest::CBlake2BLoop(size_t SampleSize, size_t Loops)
 	{
 		std::vector<uint8_t> hash(64, 0);
-		size_t bufLen = MB1;
+		size_t bufLen = MB10;
 		std::vector<uint8_t> buffer(bufLen, 0);
 		std::vector<uint8_t> key(0, 0);
 		const char* name = "Blake2b";
@@ -47,7 +47,7 @@ namespace BlakeTest
 	void DigestSpeedTest::CBlake2BPLoop(size_t SampleSize, size_t Loops)
 	{
 		std::vector<uint8_t> hash(64, 0);
-		std::vector<uint8_t> buffer(SampleSize / 4, 0);
+		std::vector<uint8_t> buffer(MB10, 0);
 		std::vector<uint8_t> key(0, 0);
 		const char* name = "Blake2bp";
 		uint64_t start = TestUtils::GetTimeMs64();
@@ -85,7 +85,7 @@ namespace BlakeTest
 	void DigestSpeedTest::CppBlake2BLoop(size_t SampleSize, size_t Loops, bool Parallel)
 	{
 		Blake2::Blake2Bp512 dgt(Parallel);
-		size_t bufLen = Parallel ? SampleSize / 4 : MB1;
+		size_t bufLen = MB10;
 		std::vector<uint8_t> hash(dgt.DigestSize(), 0);
 		std::vector<uint8_t> buffer(bufLen, 0);
 		const char* name = dgt.Name();
@@ -123,7 +123,7 @@ namespace BlakeTest
 	{
 		Blake2::Blake2Params treeParams = { 64, 0, 4, 2, 0, 0, 0, 64, Degree };
 		Blake2::Blake2Bp512 dgt(treeParams);
-		size_t bufLen = SampleSize / treeParams.ThreadDepth();
+		size_t bufLen = MB10;
 		std::vector<uint8_t> hash(dgt.DigestSize(), 0);
 		std::vector<uint8_t> buffer(bufLen, 0);
 		const char* name = dgt.Name();

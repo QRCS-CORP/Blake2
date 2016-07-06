@@ -16,8 +16,6 @@
 #ifndef __BLAKE2_CONFIG_H__
 #define __BLAKE2_CONFIG_H__
 
-#define HAVE_SSE41
-
 // These don't work everywhere
 #if defined(__SSE2__)
 #define HAVE_SSE2
@@ -64,6 +62,23 @@
 
 #ifdef HAVE_SSSE3
 #define HAVE_SSE2
+#endif
+
+#if defined(_MSC_VER) && !defined(HAS_SSE4) && !defined(HAS_SSSE3) && !defined(HAS_SSE2)
+#	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
+#		define HAVE_SSSE3
+#		define HAVE_SSE2
+#	elif _MSC_VER >= 1500 && _MSC_FULL_VER >= 150030729
+#		define HAVE_SSSE3
+#		if !defined(HAVE_SSE2)
+#			define HAVE_SSE2
+#		endif
+#	elif _MSC_VER > 1200 || defined(_mm_free)
+#		define HAVE_SSSE3
+#		if !defined(HAVE_SSE2)
+#			define HAVE_SSE2
+#		endif
+#	endif
 #endif
 
 #if !defined(HAVE_SSE2)
