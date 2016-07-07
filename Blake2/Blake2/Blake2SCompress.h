@@ -33,6 +33,7 @@ namespace Blake2
 #		endif
 #	endif
 #endif
+
 		template <typename T>
 		static inline void ICompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
 		{
@@ -914,23 +915,7 @@ namespace Blake2
 		static inline void UCompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
 		{
 			std::vector<uint32_t> msg(16);
-
-			msg[0] = IntUtils::BytesToLe32(Input, InOffset);
-			msg[1] = IntUtils::BytesToLe32(Input, InOffset + 4);
-			msg[2] = IntUtils::BytesToLe32(Input, InOffset + 8);
-			msg[3] = IntUtils::BytesToLe32(Input, InOffset + 12);
-			msg[4] = IntUtils::BytesToLe32(Input, InOffset + 16);
-			msg[5] = IntUtils::BytesToLe32(Input, InOffset + 20);
-			msg[6] = IntUtils::BytesToLe32(Input, InOffset + 24);
-			msg[7] = IntUtils::BytesToLe32(Input, InOffset + 28);
-			msg[8] = IntUtils::BytesToLe32(Input, InOffset + 32);
-			msg[9] = IntUtils::BytesToLe32(Input, InOffset + 36);
-			msg[10] = IntUtils::BytesToLe32(Input, InOffset + 40);
-			msg[11] = IntUtils::BytesToLe32(Input, InOffset + 44);
-			msg[12] = IntUtils::BytesToLe32(Input, InOffset + 48);
-			msg[13] = IntUtils::BytesToLe32(Input, InOffset + 52);
-			msg[14] = IntUtils::BytesToLe32(Input, InOffset + 56);
-			msg[15] = IntUtils::BytesToLe32(Input, InOffset + 60);
+			IntUtils::BytesToLeUL512(Input, InOffset, msg, 0);
 
 			uint32_t v0 = State.H[0];
 			uint32_t v1 = State.H[1];

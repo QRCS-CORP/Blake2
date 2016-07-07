@@ -80,6 +80,7 @@ namespace Blake2
 			  row4h = _mm_unpackhi_epi64(row4h, _mm_unpacklo_epi64(t1, t1))
 #	endif
 #endif
+
 		template <typename T>
 		static inline void ICompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
 		{
@@ -1171,23 +1172,7 @@ namespace Blake2
 		static inline void UCompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
 		{
 			std::vector<uint64_t> msg(16);
-
-			msg[0] = IntUtils::BytesToLe64(Input, InOffset);
-			msg[1] = IntUtils::BytesToLe64(Input, InOffset + 8);
-			msg[2] = IntUtils::BytesToLe64(Input, InOffset + 16);
-			msg[3] = IntUtils::BytesToLe64(Input, InOffset + 24);
-			msg[4] = IntUtils::BytesToLe64(Input, InOffset + 32);
-			msg[5] = IntUtils::BytesToLe64(Input, InOffset + 40);
-			msg[6] = IntUtils::BytesToLe64(Input, InOffset + 48);
-			msg[7] = IntUtils::BytesToLe64(Input, InOffset + 56);
-			msg[8] = IntUtils::BytesToLe64(Input, InOffset + 64);
-			msg[9] = IntUtils::BytesToLe64(Input, InOffset + 72);
-			msg[10] = IntUtils::BytesToLe64(Input, InOffset + 80);
-			msg[11] = IntUtils::BytesToLe64(Input, InOffset + 88);
-			msg[12] = IntUtils::BytesToLe64(Input, InOffset + 96);
-			msg[13] = IntUtils::BytesToLe64(Input, InOffset + 104);
-			msg[14] = IntUtils::BytesToLe64(Input, InOffset + 112);
-			msg[15] = IntUtils::BytesToLe64(Input, InOffset + 120);
+			IntUtils::BytesToLeULL512(Input, InOffset, msg, 0);
 
 			uint64_t v0 = State.H[0];
 			uint64_t v1 = State.H[1];
