@@ -264,8 +264,6 @@ namespace Blake2
 		size_t bufSize = DIGEST_SIZE;
 		std::vector<uint8_t> inpCtr(BLOCK_SIZE);
 
-		// start counter at 1
-		Increment(inpCtr);
 		// add the key to state
 		LoadMacKey(MacKey);
 		// process the key
