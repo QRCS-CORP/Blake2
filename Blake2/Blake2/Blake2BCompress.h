@@ -1,7 +1,9 @@
 #ifndef _BLAKE2_BLAKE2BCOMPRESS_H
 #define _BLAKE2_BLAKE2BCOMPRESS_H
 
-#include "Intrinsics.h"
+#if defined(HAS_ADVINTRIN)
+#	include "Intrinsics.h"
+#endif
 #include "IntUtils.h"
 
 namespace Blake2
@@ -77,10 +79,12 @@ namespace Blake2
 			  row4l = _mm_unpackhi_epi64(row4l, _mm_unpacklo_epi64(row4h, row4h)); \
 			  row4h = _mm_unpackhi_epi64(row4h, _mm_unpacklo_epi64(t1, t1))
 #	endif
+#endif
 		template <typename T>
-		static inline void Compress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
+		static inline void ICompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
 		{
-#if defined(HAS_SSE4)
+#if defined(HAS_ADVINTRIN)
+#    if defined(HAS_SSE4)
 			const __m128i m0 = _mm_loadu_si128((const __m128i*)&Input[InOffset]);
 			const __m128i m1 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 16]);
 			const __m128i m2 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 32]);
@@ -89,7 +93,7 @@ namespace Blake2
 			const __m128i m5 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 80]);
 			const __m128i m6 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 96]);
 			const __m128i m7 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 112]);
-#else
+#	else
 			uint8_t* block = (uint8_t*)Input.data() + InOffset;
 			const uint64_t m0 = ((uint64_t*)block)[0];
 			const uint64_t m1 = ((uint64_t*)block)[1];
@@ -107,11 +111,11 @@ namespace Blake2
 			const uint64_t m13 = ((uint64_t*)block)[13];
 			const uint64_t m14 = ((uint64_t*)block)[14];
 			const uint64_t m15 = ((uint64_t*)block)[15];
-#endif
-#if defined(HAS_SSSE3) && !defined(HAS_XOP)
+#    endif
+#    if defined(HAS_SSSE3) && !defined(HAS_XOP)
 			const __m128i r16 = _mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9);
 			const __m128i r24 = _mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10);
-#endif
+#    endif
 			__m128i row1l = _mm_loadu_si128((const __m128i*)&State.H[0]);
 			__m128i row1h = _mm_loadu_si128((const __m128i*)&State.H[2]);
 			__m128i row2l = _mm_loadu_si128((const __m128i*)&State.H[4]);
@@ -124,13 +128,13 @@ namespace Blake2
 
 			// round 0
 			// lm 0.1
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m0, m1);
 			b1 = _mm_unpacklo_epi64(m2, m3);
-#else
+#    else
 			b0 = _mm_set_epi64x(m2, m0);
 			b1 = _mm_set_epi64x(m6, m4);
-#endif
+#    endif
 			// g1
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
@@ -146,13 +150,13 @@ namespace Blake2
 			row2h = _mm_roti_epi64(row2h, -24);
 
 			// lm 0.2
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m0, m1);
 			b1 = _mm_unpackhi_epi64(m2, m3);
-#else
+#    else
 			b0 = _mm_set_epi64x(m3, m1);
 			b1 = _mm_set_epi64x(m7, m5);
-#endif
+#    endif
 			// g2
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
@@ -170,13 +174,13 @@ namespace Blake2
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// lm 0.3
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m4, m5);
 			b1 = _mm_unpacklo_epi64(m6, m7);
-#else
+#    else
 			b0 = _mm_set_epi64x(m10, m8);
 			b1 = _mm_set_epi64x(m14, m12);
-#endif
+#    endif
 			// g1
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
@@ -192,13 +196,13 @@ namespace Blake2
 			row2h = _mm_roti_epi64(row2h, -24);
 
 			// lm 0.4
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m4, m5);
 			b1 = _mm_unpackhi_epi64(m6, m7);
-#else
+#    else
 			b0 = _mm_set_epi64x(m11, m9);
 			b1 = _mm_set_epi64x(m15, m13);
-#endif
+#    endif
 			// g2
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
@@ -216,13 +220,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 2
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m7, m2);
 			b1 = _mm_unpackhi_epi64(m4, m6);
-#else
+#    else
 			b0 = _mm_set_epi64x(m4, m14);
 			b1 = _mm_set_epi64x(m13, m9);
-#endif
+#    endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -236,13 +240,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m5, m4);
 			b1 = _mm_alignr_epi8(m3, m7, 8);
-#else
+#    else
 			b0 = _mm_set_epi64x(m8, m10);
 			b1 = _mm_set_epi64x(m6, m15);
-#endif
+#    endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -258,13 +262,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_shuffle_epi32(m0, _MM_SHUFFLE(1, 0, 3, 2));
 			b1 = _mm_unpackhi_epi64(m5, m2);
-#else
+#    else
 			b0 = _mm_set_epi64x(m0, m1);
 			b1 = _mm_set_epi64x(m5, m11);
-#endif
+#    endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -278,13 +282,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m6, m1);
 			b1 = _mm_unpackhi_epi64(m3, m1);
-#else
+#    else
 			b0 = _mm_set_epi64x(m2, m12);
 			b1 = _mm_set_epi64x(m3, m7);
-#endif
+#    endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -301,13 +305,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 3
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_alignr_epi8(m6, m5, 8);
 			b1 = _mm_unpackhi_epi64(m2, m7);
-#else
+#    else
 			b0 = _mm_set_epi64x(m12, m11);
 			b1 = _mm_set_epi64x(m15, m5);
-#endif
+#    endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -321,13 +325,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m4, m0);
 			b1 = _mm_blend_epi16(m1, m6, 0xF0);
-#else
+#    else
 			b0 = _mm_set_epi64x(m0, m8);
 			b1 = _mm_set_epi64x(m13, m2);
-#endif
+#    endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -343,13 +347,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 			b0 = _mm_blend_epi16(m5, m1, 0xF0);
 			b1 = _mm_unpackhi_epi64(m3, m4);
-#else
+#    else
 			b0 = _mm_set_epi64x(m3, m10);
 			b1 = _mm_set_epi64x(m9, m7);
-#endif
+#    endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -363,13 +367,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m7, m3);
 			b1 = _mm_alignr_epi8(m2, m0, 8);
-#else
+#	else
 			b0 = _mm_set_epi64x(m6, m14);
 			b1 = _mm_set_epi64x(m4, m1);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -386,13 +390,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 4
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m3, m1);
 			b1 = _mm_unpackhi_epi64(m6, m5);
-#else
+#	else
 			b0 = _mm_set_epi64x(m3, m7);
 			b1 = _mm_set_epi64x(m11, m13);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -406,13 +410,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m4, m0);
 			b1 = _mm_unpacklo_epi64(m6, m7);
-#else
+#	else
 			b0 = _mm_set_epi64x(m1, m9);
 			b1 = _mm_set_epi64x(m14, m12);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -428,13 +432,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_blend_epi16(m1, m2, 0xF0);
 			b1 = _mm_blend_epi16(m2, m7, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m5, m2);
 			b1 = _mm_set_epi64x(m15, m4);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -448,13 +452,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m3, m5);
 			b1 = _mm_unpacklo_epi64(m0, m4);
-#else
+#	else
 			b0 = _mm_set_epi64x(m10, m6);
 			b1 = _mm_set_epi64x(m8, m0);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -471,13 +475,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 5
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m4, m2);
 			b1 = _mm_unpacklo_epi64(m1, m5);
-#else
+#	else
 			b0 = _mm_set_epi64x(m5, m9);
 			b1 = _mm_set_epi64x(m10, m2);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -491,13 +495,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_blend_epi16(m0, m3, 0xF0);
 			b1 = _mm_blend_epi16(m2, m7, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m7, m0);
 			b1 = _mm_set_epi64x(m15, m4);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -513,13 +517,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_blend_epi16(m7, m5, 0xF0);
 			b1 = _mm_blend_epi16(m3, m1, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m11, m14);
 			b1 = _mm_set_epi64x(m3, m6);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -533,13 +537,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_alignr_epi8(m6, m0, 8);
 			b1 = _mm_blend_epi16(m4, m6, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m12, m1);
 			b1 = _mm_set_epi64x(m13, m8);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -556,13 +560,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 6
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m1, m3);
 			b1 = _mm_unpacklo_epi64(m0, m4);
-#else
+#	else
 			b0 = _mm_set_epi64x(m6, m2);
 			b1 = _mm_set_epi64x(m8, m0);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -576,13 +580,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m6, m5);
 			b1 = _mm_unpackhi_epi64(m5, m1);
-#else
+#	else
 			b0 = _mm_set_epi64x(m10, m12);
 			b1 = _mm_set_epi64x(m3, m11);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -598,13 +602,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_blend_epi16(m2, m3, 0xF0);
 			b1 = _mm_unpackhi_epi64(m7, m0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m7, m4);
 			b1 = _mm_set_epi64x(m1, m15);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -618,13 +622,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m6, m2);
 			b1 = _mm_blend_epi16(m7, m4, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m5, m13);
 			b1 = _mm_set_epi64x(m9, m14);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -641,13 +645,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 7
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_blend_epi16(m6, m0, 0xF0);
 			b1 = _mm_unpacklo_epi64(m7, m2);
-#else
+#	else
 			b0 = _mm_set_epi64x(m1, m12);
 			b1 = _mm_set_epi64x(m4, m14);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -661,13 +665,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m2, m7);
 			b1 = _mm_alignr_epi8(m5, m6, 8);
-#else
+#	else
 			b0 = _mm_set_epi64x(m15, m5);
 			b1 = _mm_set_epi64x(m10, m13);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -683,13 +687,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m0, m3);
 			b1 = _mm_shuffle_epi32(m4, _MM_SHUFFLE(1, 0, 3, 2));
-#else
+#	else
 			b0 = _mm_set_epi64x(m6, m0);
 			b1 = _mm_set_epi64x(m8, m9);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -703,13 +707,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m3, m1);
 			b1 = _mm_blend_epi16(m1, m5, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m3, m7);
 			b1 = _mm_set_epi64x(m11, m2);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -726,13 +730,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 8
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m6, m3);
 			b1 = _mm_blend_epi16(m6, m1, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m7, m13);
 			b1 = _mm_set_epi64x(m3, m12);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -746,13 +750,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_alignr_epi8(m7, m5, 8);
 			b1 = _mm_unpackhi_epi64(m0, m4);
-#else
+#	else
 			b0 = _mm_set_epi64x(m14, m11);
 			b1 = _mm_set_epi64x(m9, m1);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -768,13 +772,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m2, m7);
 			b1 = _mm_unpacklo_epi64(m4, m1);
-#else
+#	else
 			b0 = _mm_set_epi64x(m15, m5);
 			b1 = _mm_set_epi64x(m2, m8);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -788,13 +792,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m0, m2);
 			b1 = _mm_unpacklo_epi64(m3, m5);
-#else
+#	else
 			b0 = _mm_set_epi64x(m4, m0);
 			b1 = _mm_set_epi64x(m10, m6);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -811,13 +815,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 9
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m3, m7);
 			b1 = _mm_alignr_epi8(m0, m5, 8);
-#else
+#	else
 			b0 = _mm_set_epi64x(m14, m6);
 			b1 = _mm_set_epi64x(m0, m11);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -831,13 +835,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m7, m4);
 			b1 = _mm_alignr_epi8(m4, m1, 8);
-#else
+#	else
 			b0 = _mm_set_epi64x(m9, m15);
 			b1 = _mm_set_epi64x(m8, m3);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -853,13 +857,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = m6;
 			b1 = _mm_alignr_epi8(m5, m0, 8);
-#else
+#	else
 			b0 = _mm_set_epi64x(m13, m12);
 			b1 = _mm_set_epi64x(m10, m1);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -873,13 +877,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_blend_epi16(m1, m3, 0xF0);
 			b1 = m2;
-#else
+#	else
 			b0 = _mm_set_epi64x(m7, m2);
 			b1 = _mm_set_epi64x(m5, m4);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -896,13 +900,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 10
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m5, m4);
 			b1 = _mm_unpackhi_epi64(m3, m0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m8, m10);
 			b1 = _mm_set_epi64x(m1, m7);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -916,13 +920,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m1, m2);
 			b1 = _mm_blend_epi16(m3, m2, 0xF0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m4, m2);
 			b1 = _mm_set_epi64x(m5, m6);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -938,13 +942,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m7, m4);
 			b1 = _mm_unpackhi_epi64(m1, m6);
-#else
+#	else
 			b0 = _mm_set_epi64x(m9, m15);
 			b1 = _mm_set_epi64x(m13, m3);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -958,13 +962,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_alignr_epi8(m7, m5, 8);
 			b1 = _mm_unpacklo_epi64(m6, m0);
-#else
+#	else
 			b0 = _mm_set_epi64x(m14, m11);
 			b1 = _mm_set_epi64x(m0, m12);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -981,13 +985,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 11
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m0, m1);
 			b1 = _mm_unpacklo_epi64(m2, m3);
-#else
+#	else
 			b0 = _mm_set_epi64x(m2, m0);
 			b1 = _mm_set_epi64x(m6, m4);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1001,13 +1005,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m0, m1);
 			b1 = _mm_unpackhi_epi64(m2, m3);
-#else
+#	else
 			b0 = _mm_set_epi64x(m3, m1);
 			b1 = _mm_set_epi64x(m7, m5);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1023,13 +1027,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m4, m5);
 			b1 = _mm_unpacklo_epi64(m6, m7);
-#else
+#	else
 			b0 = _mm_set_epi64x(m10, m8);
 			b1 = _mm_set_epi64x(m14, m12);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1043,13 +1047,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpackhi_epi64(m4, m5);
 			b1 = _mm_unpackhi_epi64(m6, m7);
-#else
+#	else
 			b0 = _mm_set_epi64x(m11, m9);
 			b1 = _mm_set_epi64x(m15, m13);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1066,13 +1070,13 @@ namespace Blake2
 			UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
 			// round 12
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m7, m2);
 			b1 = _mm_unpackhi_epi64(m4, m6);
-#else
+#	else
 			b0 = _mm_set_epi64x(m4, m14);
 			b1 = _mm_set_epi64x(m13, m9);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1086,13 +1090,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m5, m4);
 			b1 = _mm_alignr_epi8(m3, m7, 8);
-#else
+#	else
 			b0 = _mm_set_epi64x(m8, m10);
 			b1 = _mm_set_epi64x(m6, m15);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1108,13 +1112,13 @@ namespace Blake2
 
 			DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_shuffle_epi32(m0, _MM_SHUFFLE(1, 0, 3, 2));
 			b1 = _mm_unpackhi_epi64(m5, m2);
-#else
+#	else
 			b0 = _mm_set_epi64x(m0, m1);
 			b1 = _mm_set_epi64x(m5, m11);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1128,13 +1132,13 @@ namespace Blake2
 			row2l = _mm_roti_epi64(row2l, -24);
 			row2h = _mm_roti_epi64(row2h, -24);
 
-#if defined(HAS_SSE4)
+#	if defined(HAS_SSE4)
 			b0 = _mm_unpacklo_epi64(m6, m1);
 			b1 = _mm_unpackhi_epi64(m3, m1);
-#else
+#	else
 			b0 = _mm_set_epi64x(m2, m12);
 			b1 = _mm_set_epi64x(m3, m7);
-#endif
+#	endif
 			row1l = _mm_add_epi64(_mm_add_epi64(row1l, b0), row2l);
 			row1h = _mm_add_epi64(_mm_add_epi64(row1h, b1), row2h);
 			row4l = _mm_xor_si128(row4l, row1l);
@@ -1158,10 +1162,13 @@ namespace Blake2
 			row2h = _mm_xor_si128(row4h, row2h);
 			_mm_storeu_si128((__m128i*)&State.H[4], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[4]), row2l));
 			_mm_storeu_si128((__m128i*)&State.H[6], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[6]), row2h));
-		}
 #else
+			UCompress(Input, InOffset, State, IV);
+#endif
+		}
+
 		template <typename T>
-		static inline void Compress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
+		static inline void UCompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
 		{
 			std::vector<uint64_t> msg(16);
 
@@ -2468,7 +2475,6 @@ namespace Blake2
 			State.H[6] ^= v6 ^ v14;
 			State.H[7] ^= v7 ^ v15;
 		}
-#endif
 	};
 }
 #endif

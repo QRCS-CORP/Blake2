@@ -1,0 +1,7 @@
+Version 1.1a
+Changes July 04, 2016:
+* 1.1a released
+
+Version 1.1b
+Changes July 08, 2016:
+* Added runtime switching for intrinsic/unrolled compression based on cpu support

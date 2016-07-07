@@ -1,0 +1,14 @@
+﻿  blake2b.c
+  blake2bp.c
+..\..\BlakeC\blake2bp.c(168): warning C4028: formal parameter 3 different from declaration
+..\..\BlakeC\blake2bp.c(193): warning C4028: formal parameter 4 different from declaration
+..\..\BlakeC\blake2bp.c(193): warning C4028: formal parameter 5 different from declaration
+  blake2s.c
+..\..\BlakeC\blake2s.c(266): warning C4101: 'r16': unreferenced local variable
+..\..\BlakeC\blake2s.c(265): warning C4101: 'r8': unreferenced local variable
+  blake2sp.c
+..\..\BlakeC\blake2sp.c(162): warning C4028: formal parameter 3 different from declaration
+..\..\BlakeC\blake2sp.c(187): warning C4028: formal parameter 4 different from declaration
+..\..\BlakeC\blake2sp.c(187): warning C4028: formal parameter 5 different from declaration
+  Blake2bX.cpp
+  CBlake.vcxproj -> C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\Blake2\Win\x64\Release\CBlake.lib
