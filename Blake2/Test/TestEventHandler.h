@@ -4,7 +4,7 @@
 #include "TestEvent.h"
 #include "ConsoleUtils.h"
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	class TestEventHandler : public TestEvent<TestEventHandler>
 	{

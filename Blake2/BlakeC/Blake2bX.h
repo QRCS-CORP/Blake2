@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdio.h>
 
-namespace BlakeTest
+namespace TestBlake2
 {
 #pragma pack(push, 1)
 	typedef struct __blake2bx_state

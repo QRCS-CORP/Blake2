@@ -4,7 +4,7 @@
 #include <string.h>
 #include <vector>
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	/// <summary>
 	/// A Hexadecimal conversion helper class

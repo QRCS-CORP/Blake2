@@ -1,0 +1,10 @@
+﻿  DigestFromName.cpp
+  Blake256.cpp
+c:\users\john\documents\visual studio 2015\projects\cryptography\blake2\blake2\blake256.cpp(289): warning C4267: 'argument': conversion from 'size_t' to 'byte', possible loss of data
+  Blake512.cpp
+c:\users\john\documents\visual studio 2015\projects\cryptography\blake2\blake2\blake512.cpp(288): warning C4267: 'argument': conversion from 'size_t' to 'byte', possible loss of data
+  Generating Code...
+  Compiling...
+  HMAC.cpp
+  Generating Code...
+  Blake2.vcxproj -> C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\Blake2\Win\Debug\Blake2.lib

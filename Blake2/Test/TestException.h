@@ -5,7 +5,7 @@
 #include <iostream>
 #include <exception>
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	/// <summary>
 	/// Generalized error container

@@ -2,10 +2,12 @@
 #define _BLAKE2TEST_DIGESTSPEEDTEST_H
 
 #include "ITest.h"
-#include <sstream>
+#include "../Blake2/Digests.h"
 
-namespace BlakeTest
+namespace TestBlake2
 {
+	using CEX::Enumeration::Digests;
+
 	/// <summary>
 	/// Blake2 Digest Speed Tests
 	/// </summary>
@@ -55,60 +57,14 @@ namespace BlakeTest
 		{
 			try
 			{
-				if (m_testCycle == 0)
-				{
-					OnProgress("*** TEST PARAMETERS ***");
-					OnProgress("Blake2B and Blake2BP are all tested for performance.");
-					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 1 GB.");
-					OnProgress("Block update sizes are fixed at 10MB times 100 iterations per 1GB loop cycle.");
-					OnProgress("10 * 1GB loops are run and added for the combined average over 10 GigaByte of data.");
-					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
-					OnProgress("The second run uses the CEX C++ version of the algorithms.");
-					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
-					OnProgress("");
-
-					OnProgress("### Blake2B Optimized C Sequential: 10 loops * 1000 MB ###");
-					CBlake2BLoop(GB1);
-					OnProgress("### Blake2BP Optimized C Parallel: 10 loops * 1000 MB ###");
-					CBlake2BPLoop(GB1);
-
-					OnProgress("### Blake2B-512 C++ Sequential: 10 loops * 1000 MB ###");
-					CppBlake2BLoop(GB1, 10);
-					OnProgress("### Blake2BP-512 C++ Parallel: 10 loops * 1000 MB ###");
-					CppBlake2BLoop(GB1, 10, true);
-				}
-				else if (m_testCycle == 1)
-				{
-					OnProgress("*** TEST PARAMETERS ***");
-					OnProgress("Blake2B and Blake2BP are all tested for performance.");
-					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
-					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
-					OnProgress("Block update sizes are fixed at 10MB times 100 iterations per 1GB loop cycle.");
-					OnProgress("The first run uses the optimized C version to establish a baseline for each of the algorithms.");
-					OnProgress("The second run uses the CEX C++ version of the algorithms.");
-					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
-					OnProgress("");
-
-					OnProgress("### Original C version BLAKE2BP Message Digest: 20 loops * 1000 MB ###");
-					CBlake2BPLoop(GB1, 20);
-
-					OnProgress("### CEX C++ BLAKE2BP Message Digest: 20 loops * 1000 MB ###");
-					CppBlake2BLoop(GB1, 20, true);
-				}
-				else
-				{
-					OnProgress("*** TEST PARAMETERS ***");
-					OnProgress("Blake2B and Blake2BP are all tested for performance using a user defined Parallel Degree.");
-					OnProgress("Speed is measured in MegaBytes (1,000,000 bytes) per Second, with a sample size of 20 GB.");
-					OnProgress("20 * 1GB loops are run and added for the combined average over 20 GigaBytes of data.");
-					OnProgress("Block update sizes are fixed at 10MB times 100 iterations per 1GB loop cycle.");
-					OnProgress("The second run uses the CEX C++ version of the algorithms.");
-					OnProgress("Both the optimized C and C++ versions use identical parameter sets.");
-					OnProgress("");
-
-					OnProgress("### Blake2B-512 C++ Sequential: 10 loops * 1000 MB ###");
-					CppBlake2BEx(GB1, m_testCycle, 20);
-				}
+				OnProgress("***The sequential Blake2 256 digest***");
+				DigestBlockLoop(Digests::Blake256, MB100, 10, false);
+				OnProgress("***The parallel Blake2 256 digest***");
+				DigestBlockLoop(Digests::Blake256, MB100, 10, true);
+				OnProgress("***The sequential Blake2 512 digest***");
+				DigestBlockLoop(Digests::Blake512, MB100, 10, false);
+				OnProgress("***The parallel Blake2 512 digest***");
+				DigestBlockLoop(Digests::Blake512, MB100, 10, true);
 
 				return MESSAGE;
 			}
@@ -123,20 +79,10 @@ namespace BlakeTest
 		}
 
 	private:
-		void CBlake2BLoop(size_t SampleSize, size_t Loops = DEFITER);
-		void CBlake2BPLoop(size_t SampleSize, size_t Loops = DEFITER);
-		void CppBlake2BLoop(size_t SampleSize, size_t Loops = DEFITER, bool Parallel = false);
-		void CppBlake2BEx(size_t SampleSize, uint8_t Degree, size_t Loops = DEFITER);
+
+		void DigestBlockLoop(Digests DigestType, size_t SampleSize, size_t Loops = DEFITER, bool Parallel = false);
 		uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void OnProgress(char* Data);
-
-		template<typename T>
-		static inline std::string IntToString(const T& Value)
-		{
-			std::ostringstream oss;
-			oss << Value;
-			return oss.str();
-		}
 	};
 }
 

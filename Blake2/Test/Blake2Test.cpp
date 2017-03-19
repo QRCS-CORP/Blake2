@@ -1,25 +1,26 @@
 #include "Blake2Test.h"
 #include <fstream>
 #include <string.h>
-
 #include "HexConverter.h"
 #include "CSPRsg.h"
 
-#include "../Blake2/Blake2Sp256.h"
-#include "../Blake2/Blake2Bp512.h"
-#include "../Blake2/MacParams.h"
+#include "../Blake2/Blake256.h"
+#include "../Blake2/Blake512.h"
 #include "../BlakeC/blake2.h"
+#include "../Blake2/HMAC.h"
+#include "../Blake2/SymmetricKey.h"
 
-namespace BlakeTest
+namespace TestBlake2
 {
+	using namespace CEX::Digest;
+	using CEX::Key::Symmetric::SymmetricKey;
+
 	std::string Blake2Test::Run()
 	{
 		try
 		{
 			TreeParamsTest();
-			OnProgress("Passed Blake2Params parameter serialization test..");
-			MacParamsTest();
-			OnProgress("Passed MacParams cloning test..");
+			OnProgress("Passed BlakeParams parameter serialization test..");
 			Blake2STest();
 			OnProgress("Passed Blake2-S 256 vector tests..");
 			Blake2SPTest();
@@ -28,17 +29,17 @@ namespace BlakeTest
 			OnProgress("Passed Blake2-B 512 vector tests..");
 			Blake2BPTest();
 			OnProgress("Passed Blake2-BP 512 vector tests..");    
-			OnProgress("");
+			OnProgress("");/**/
 
 			OnProgress("Each algorithm is tested 1000 times with pseudo random message arrays");
 			OnProgress("These tests compare output between the official C versions and the CEX C++ versions");
 			OnProgress("");
 			Blake2BRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake2B random sample comparisons..");
+			OnProgress("Passed 1000 rounds of Blake512Compress random sample comparisons..");
 			Blake2BPRandomSampleTest();
 			OnProgress("Passed 1000 rounds of Blake2BP random sample comparisons..");
 			Blake2SRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake2S random sample comparisons..");
+			OnProgress("Passed 1000 rounds of Blake256Compress random sample comparisons..");
 			Blake2SPRandomSampleTest();
 			OnProgress("Passed 1000 rounds of Blake2SP random sample comparisons..");/**/
 
@@ -87,10 +88,9 @@ namespace BlakeTest
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Blake2::MacParams mkey(key);
-					Blake2::Blake2Bp512 blake2b(false);
-					blake2b.LoadMacKey(mkey);
-					blake2b.ComputeHash(input, hash);
+					Blake512 blake2b(false);
+					blake2b.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					blake2b.Compute(input, hash);
 
 					if (hash != expect)
 						throw std::string("Blake2BTest: KAT test has failed!");
@@ -134,10 +134,9 @@ namespace BlakeTest
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Blake2::Blake2Bp512 blake2(true);
-					Blake2::MacParams mkey(key);
-					blake2.LoadMacKey(mkey);
-					blake2.ComputeHash(input, hash);
+					Blake512 blake2bp(true);
+					blake2bp.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					blake2bp.Compute(input, hash);
 
 					if (hash != expect)
 						throw std::string("Blake2BPTest: KAT test has failed!");
@@ -164,8 +163,8 @@ namespace BlakeTest
 			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
-			Blake2::Blake2Bp512 blake2b(false);
-			blake2b.ComputeHash(input, hash1);
+			Blake512 blake2b(false);
+			blake2b.Compute(input, hash1);
 
 			blake2b_init(S, 64);
 			blake2b_update(S, input.data(), input.size());
@@ -198,8 +197,8 @@ namespace BlakeTest
 			blake2bp_update(S, input.data(), input.size());
 			blake2bp_final(S, hash2.data(), hash2.size());
 
-			Blake2::Blake2Bp512 blake2b(true);
-			blake2b.ComputeHash(input, hash1);
+			Blake512 blake2b(true);
+			blake2b.Compute(input, hash1);
 
 			if (hash1 != hash2)
 				throw std::string("Blake2BPTest: Random sample test has failed!");
@@ -239,10 +238,9 @@ namespace BlakeTest
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Blake2::MacParams mkey(key);
-					Blake2::Blake2Sp256 blake2s(false);
-					blake2s.LoadMacKey(mkey);
-					blake2s.ComputeHash(input, hash);
+					Blake256 blake2s(false);
+					blake2s.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					blake2s.Compute(input, hash);
 
 					if (hash != expect)
 						throw std::string("Blake2STest: KAT test has failed!");
@@ -285,10 +283,9 @@ namespace BlakeTest
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Blake2::MacParams mkey(key);
-					Blake2::Blake2Sp256 blake2sp(true);
-					blake2sp.LoadMacKey(mkey);
-					blake2sp.ComputeHash(input, hash);
+					Blake256 blake2sp(true);
+					blake2sp.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					blake2sp.Compute(input, hash);
 
 					if (hash != expect)
 						throw std::string("Blake2SPTest: KAT test has failed!");
@@ -315,8 +312,8 @@ namespace BlakeTest
 			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
-			Blake2::Blake2Sp256 blake2s(false);
-			blake2s.ComputeHash(input, hash1);
+			Blake256 blake2s(false);
+			blake2s.Compute(input, hash1);
 
 			blake2s_init(S, 32);
 			blake2s_update(S, input.data(), input.size());
@@ -345,8 +342,8 @@ namespace BlakeTest
 			// get p-rand
 			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
 
-			Blake2::Blake2Sp256 blake2s(true);
-			blake2s.ComputeHash(input, hash1);
+			Blake256 blake2s(true);
+			blake2s.Compute(input, hash1);
 
 			blake2sp_init(S, 32);
 			blake2sp_update(S, input.data(), input.size());
@@ -357,25 +354,11 @@ namespace BlakeTest
 		}
 	}
 
-	void Blake2Test::MacParamsTest()
-	{
-		std::vector<uint8_t> key(64);
-		for (size_t i = 0; i < key.size(); ++i)
-			key[i] = i;
-
-		Blake2::MacParams mkey(key, key, key);
-		Blake2::MacParams* mkey2 = mkey.DeepCopy();
-		Blake2::MacParams mkey3 = mkey.Clone();
-
-		if (!mkey.Equals(*mkey2) || !mkey.Equals(mkey3))
-			throw std::string("Blake2STest: Mac parameters test failed!");
-	}
-
 	void Blake2Test::TreeParamsTest()
 	{
-		Blake2::Blake2Params tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
+		BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
 		std::vector<uint8_t> tres = tree1.ToBytes();
-		Blake2::Blake2Params tree2(tres);
+		BlakeParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
 			throw std::string("Blake2STest: Tree parameters test failed!");

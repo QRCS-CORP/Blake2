@@ -34,6 +34,9 @@
     <Filter Include="Header Files\Test\Vectors">
       <UniqueIdentifier>{8ffe9c6a-90b5-4f91-9f96-1c0ec792e368}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Blake2C">
+      <UniqueIdentifier>{535542c3-b341-462e-8e24-a8475d188479}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Test\ConsoleUtils.h">
@@ -69,6 +72,45 @@
     <ClInclude Include="..\..\Test\CSPRsg.h">
       <Filter>Header Files\Test\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2s-round.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2s-load-xop.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2s-load-sse41.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2s-load-sse2.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\Blake2Ref.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2-impl.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\Blake2Diff.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2-config.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\Blake2bX.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2b-round.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2b-load-sse41.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2b-load-sse2.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BlakeC\blake2.h">
+      <Filter>Header Files\Blake2C</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\Test.cpp">
@@ -79,6 +121,18 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\BlakeC\blake2b.c">
+      <Filter>Source Files\Blake2C</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\BlakeC\blake2bp.c">
+      <Filter>Source Files\Blake2C</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\BlakeC\blake2s.c">
+      <Filter>Source Files\Blake2C</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\BlakeC\blake2sp.c">
+      <Filter>Source Files\Blake2C</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

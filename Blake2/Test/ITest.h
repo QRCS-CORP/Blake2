@@ -4,7 +4,7 @@
 #include "TestCommon.h"
 #include "TestEventHandler.h"
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	/// <summary>
 	/// Test Interface

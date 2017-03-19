@@ -1,7 +1,7 @@
 #include "Blake2bX.h"
 
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	/* init xors IV with input parameter block */
 	int Blake2bX::blake2b_init_paramX(blake2bx_state *S, const blake2b_param *P)

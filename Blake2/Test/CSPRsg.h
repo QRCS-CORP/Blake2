@@ -11,7 +11,7 @@
 #	include <thread>
 #endif
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	/// <summary>
 	/// A random generator

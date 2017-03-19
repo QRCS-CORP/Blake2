@@ -5,7 +5,7 @@
 #include "HexConverter.h"
 #include "ITest.h"
 
-using namespace BlakeTest;
+using namespace TestBlake2;
 
 std::string GetResponse()
 {
@@ -96,6 +96,7 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
+	RunTest(new Blake2Test());
 
 	try
 	{

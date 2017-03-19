@@ -29,7 +29,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 16.0</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -49,7 +49,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 16.0</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -99,7 +99,7 @@
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\Blake2\Win\Test\Vectors;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,6 +171,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\BlakeC\blake2-config.h" />
+    <ClInclude Include="..\..\BlakeC\blake2-impl.h" />
+    <ClInclude Include="..\..\BlakeC\blake2.h" />
+    <ClInclude Include="..\..\BlakeC\blake2b-load-sse2.h" />
+    <ClInclude Include="..\..\BlakeC\blake2b-load-sse41.h" />
+    <ClInclude Include="..\..\BlakeC\blake2b-round.h" />
+    <ClInclude Include="..\..\BlakeC\Blake2bX.h" />
+    <ClInclude Include="..\..\BlakeC\Blake2Diff.h" />
+    <ClInclude Include="..\..\BlakeC\Blake2Ref.h" />
+    <ClInclude Include="..\..\BlakeC\blake2s-load-sse2.h" />
+    <ClInclude Include="..\..\BlakeC\blake2s-load-sse41.h" />
+    <ClInclude Include="..\..\BlakeC\blake2s-load-xop.h" />
+    <ClInclude Include="..\..\BlakeC\blake2s-round.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
@@ -184,6 +197,10 @@
     <ClInclude Include="..\..\Test\TestUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\BlakeC\blake2b.c" />
+    <ClCompile Include="..\..\BlakeC\blake2bp.c" />
+    <ClCompile Include="..\..\BlakeC\blake2s.c" />
+    <ClCompile Include="..\..\BlakeC\blake2sp.c" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\Test.cpp" />

@@ -1,10 +1,11 @@
-#ifndef _BLAKE2TEST_INTRINSICS_H
-#define _BLAKE2TEST_INTRINSICS_H
+#ifndef _CEX_INTRINSICS_H
+#define _CEX_INTRINSICS_H
 
-#include "Config.h"
+#include "CexConfig.h"
 
 #if defined(_MSC_VER)
 #	include <intrin.h>		// Microsoft C/C++-compatible compiler
+#	include <wmmintrin.h>	// Intel AES and PCLMULQDQ intrinsics
 #elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__)) 
 #	include <x86intrin.h>	// GCC-compatible compiler, targeting x86/x86-64
 #elif defined(__GNUC__) && defined(__ARM_NEON__) 
@@ -17,24 +18,25 @@
 #	include <spe.h>			// GCC-compatible compiler, targeting PowerPC with SPE
 #endif
 
-#if defined(HAS_AVX2)
+#if defined(CEX_HAS_AVX2)
 #	include <zmmintrin.h>
-#elif defined(HAS_AVX)
+#elif defined(CEX_HAS_AVX)
 #	include <immintrin.h>
-#elif defined(HAS_XOP)
+#elif defined(CEX_HAS_XOP)
 #	include <intrin.h>
+#	include <xopintrin.h>
 #endif
-#if defined(HAS_SSE42)
+#if defined(CEX_HAS_SSE42)
 #	include <nmmintrin.h>
-#elif defined(HAS_SSE41)
+#elif defined(CEX_HAS_SSE41)
 #	include <smmintrin.h>
-#elif defined(HAS_SSE4)
+#elif defined(CEX_HAS_SSE4)
 #	include <ammintrin.h>
-#elif defined(HAS_SSSE3)
+#elif defined(CEX_HAS_SSSE3)
 #	include <tmmintrin.h>
-#elif defined(HAS_SSE3)
+#elif defined(CEX_HAS_SSE3)
 #	include <pmmintrin.h>
-#elif defined(HAS_SSE2)
+#elif !defined(CEX_HAS_SSE2)
 #	include <emmintrin.h>
 #elif defined(HAS_SSE)
 #	include <xmmintrin.h>

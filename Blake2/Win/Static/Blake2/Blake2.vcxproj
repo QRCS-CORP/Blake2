@@ -18,6 +18,64 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Blake2\ArrayUtils.h" />
+    <ClInclude Include="..\..\..\Blake2\BitConverter.h" />
+    <ClInclude Include="..\..\..\Blake2\Blake512Compress.h" />
+    <ClInclude Include="..\..\..\Blake2\BlakeParams.h" />
+    <ClInclude Include="..\..\..\Blake2\Blake256Compress.h" />
+    <ClInclude Include="..\..\..\Blake2\Blake512.h" />
+    <ClInclude Include="..\..\..\Blake2\Blake256.h" />
+    <ClInclude Include="..\..\..\Blake2\CexConfig.h" />
+    <ClInclude Include="..\..\..\Blake2\CexDomain.h" />
+    <ClInclude Include="..\..\..\Blake2\CpuDetect.h" />
+    <ClInclude Include="..\..\..\Blake2\CryptoDigestException.h" />
+    <ClInclude Include="..\..\..\Blake2\CryptoMacException.h" />
+    <ClInclude Include="..\..\..\Blake2\CryptoProcessingException.h" />
+    <ClInclude Include="..\..\..\Blake2\CryptoRandomException.h" />
+    <ClInclude Include="..\..\..\Blake2\CSP.h" />
+    <ClInclude Include="..\..\..\Blake2\DigestFromName.h" />
+    <ClInclude Include="..\..\..\Blake2\Digests.h" />
+    <ClInclude Include="..\..\..\Blake2\FileStream.h" />
+    <ClInclude Include="..\..\..\Blake2\HMAC.h" />
+    <ClInclude Include="..\..\..\Blake2\IByteStream.h" />
+    <ClInclude Include="..\..\..\Blake2\IMac.h" />
+    <ClInclude Include="..\..\..\Blake2\Intrinsics.h" />
+    <ClInclude Include="..\..\..\Blake2\IntUtils.h" />
+    <ClInclude Include="..\..\..\Blake2\ISymmetricKey.h" />
+    <ClInclude Include="..\..\..\Blake2\Macs.h" />
+    <ClInclude Include="..\..\..\Blake2\MemoryStream.h" />
+    <ClInclude Include="..\..\..\Blake2\ParallelOptions.h" />
+    <ClInclude Include="..\..\..\Blake2\ParallelUtils.h" />
+    <ClInclude Include="..\..\..\Blake2\Providers.h" />
+    <ClInclude Include="..\..\..\Blake2\SecureRandom.h" />
+    <ClInclude Include="..\..\..\Blake2\SeekOrigin.h" />
+    <ClInclude Include="..\..\..\Blake2\SimdProfiles.h" />
+    <ClInclude Include="..\..\..\Blake2\StreamModes.h" />
+    <ClInclude Include="..\..\..\Blake2\StreamReader.h" />
+    <ClInclude Include="..\..\..\Blake2\StreamWriter.h" />
+    <ClInclude Include="..\..\..\Blake2\SymmetricKey.h" />
+    <ClInclude Include="..\..\..\Blake2\SymmetricKeySize.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Blake2\ArrayUtils.cpp" />
+    <ClCompile Include="..\..\..\Blake2\BitConverter.cpp" />
+    <ClCompile Include="..\..\..\Blake2\Blake512.cpp" />
+    <ClCompile Include="..\..\..\Blake2\Blake256.cpp" />
+    <ClCompile Include="..\..\..\Blake2\CpuDetect.cpp" />
+    <ClCompile Include="..\..\..\Blake2\CSP.cpp" />
+    <ClCompile Include="..\..\..\Blake2\DigestFromName.cpp" />
+    <ClCompile Include="..\..\..\Blake2\FileStream.cpp" />
+    <ClCompile Include="..\..\..\Blake2\HMAC.cpp" />
+    <ClCompile Include="..\..\..\Blake2\IntUtils.cpp" />
+    <ClCompile Include="..\..\..\Blake2\MemoryStream.cpp" />
+    <ClCompile Include="..\..\..\Blake2\ParallelOptions.cpp" />
+    <ClCompile Include="..\..\..\Blake2\ParallelUtils.cpp" />
+    <ClCompile Include="..\..\..\Blake2\SecureRandom.cpp" />
+    <ClCompile Include="..\..\..\Blake2\StreamReader.cpp" />
+    <ClCompile Include="..\..\..\Blake2\StreamWriter.cpp" />
+    <ClCompile Include="..\..\..\Blake2\SymmetricKey.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F86BC665-F057-4111-BC21-54180D4C2353}</ProjectGuid>
     <RootNamespace>Blake2</RootNamespace>
@@ -81,6 +139,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,25 +185,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\Blake2\Blake2Params.h" />
-    <ClInclude Include="..\..\..\Blake2\Blake2Bp512.h" />
-    <ClInclude Include="..\..\..\Blake2\Blake2BCompress.h" />
-    <ClInclude Include="..\..\..\Blake2\Blake2Sp256.h" />
-    <ClInclude Include="..\..\..\Blake2\Blake2SCompress.h" />
-    <ClInclude Include="..\..\..\Blake2\Common.h" />
-    <ClInclude Include="..\..\..\Blake2\Config.h" />
-    <ClInclude Include="..\..\..\Blake2\CpuDetect.h" />
-    <ClInclude Include="..\..\..\Blake2\CryptoDigestException.h" />
-    <ClInclude Include="..\..\..\Blake2\Intrinsics.h" />
-    <ClInclude Include="..\..\..\Blake2\IntUtils.h" />
-    <ClInclude Include="..\..\..\Blake2\MacParams.h" />
-    <ClInclude Include="..\..\..\Blake2\ParallelUtils.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\Blake2\BlakeB512.cpp" />
-    <ClCompile Include="..\..\..\Blake2\BlakeS256.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

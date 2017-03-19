@@ -22,53 +22,230 @@
     <Filter Include="Source Files\Digest">
       <UniqueIdentifier>{0de27938-d06c-4f73-bd3b-aebd65cb933e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Enumeration">
+      <UniqueIdentifier>{48392ea6-626b-4492-a5ba-312ea0989ae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Exception">
+      <UniqueIdentifier>{2dda19d6-54ec-4f72-a8e0-384ce8f7f81f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helper">
+      <UniqueIdentifier>{e441c9f0-fd76-4d7b-8ff4-ce093fc46d80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{d8fa94d6-975f-43e5-8608-ca35b503f5de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Provider">
+      <UniqueIdentifier>{f1f86ae6-b3b7-4dc2-af5a-fa5127794174}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{3307e12c-c84a-4a02-b280-dc59c7f8e943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Prng">
+      <UniqueIdentifier>{4cb37635-28c1-4abe-810e-9ba4785f43ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{87f8a968-7020-4b98-8a01-0682d7335ba9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Prng">
+      <UniqueIdentifier>{87d636c3-d72b-46cd-8fdf-5cff63ab841e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider">
+      <UniqueIdentifier>{20add956-fd0c-46a7-ac8e-6a040a2ed820}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{e35d98b4-ff27-4d34-bf2c-baccd18b860b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{0db3eab9-a84d-45af-ba67-877e1acb4f2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Digest\Support">
+      <UniqueIdentifier>{f87222f8-c895-4ac5-96e7-d8b61075b0cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{eeb7cd18-728d-4591-aafc-5c441f09f575}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Mac">
+      <UniqueIdentifier>{39d02cdf-4051-4648-ae93-8d41c36becf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Mac">
+      <UniqueIdentifier>{3fdc05d7-d0ff-4de9-ad34-71ce3e092c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key">
+      <UniqueIdentifier>{ce370008-241a-42ef-b658-ac0596e95887}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key">
+      <UniqueIdentifier>{ac73ca24-0336-44e5-b885-7fffe173ecdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key\Symmetric">
+      <UniqueIdentifier>{a000d6a0-69d0-4f60-baa0-60935bd5c163}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key\Symmetric">
+      <UniqueIdentifier>{209aa004-5c55-4cbd-9d07-263683801c22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Blake2\Common.h">
+    <ClInclude Include="..\..\..\Blake2\CexConfig.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\Config.h">
+    <ClInclude Include="..\..\..\Blake2\CexDomain.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Blake2\CpuDetect.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\CryptoDigestException.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\MacParams.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\ParallelUtils.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\IntUtils.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\Blake2Params.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\Blake2Bp512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\Blake2Sp256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\Blake2BCompress.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Blake2\Blake2SCompress.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Blake2\Intrinsics.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\ParallelOptions.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Digests.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Providers.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\SimdProfiles.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\CryptoDigestException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\CryptoProcessingException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\CryptoRandomException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\DigestFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\BitConverter.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\CSP.h">
+      <Filter>Header Files\Provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\SecureRandom.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\ArrayUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\IntUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\ParallelUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Macs.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\CryptoMacException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\HMAC.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\IMac.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\ISymmetricKey.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\SymmetricKey.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\SymmetricKeySize.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\FileStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\IByteStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\SeekOrigin.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\StreamReader.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\StreamWriter.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\MemoryStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\StreamModes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake512Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\BlakeParams.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake256Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Blake2\Blake256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Blake2\BlakeB512.cpp">
+    <ClCompile Include="..\..\..\Blake2\CpuDetect.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\ParallelOptions.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\DigestFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\BitConverter.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\CSP.cpp">
+      <Filter>Source Files\Provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\SecureRandom.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\ArrayUtils.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\IntUtils.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\ParallelUtils.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\HMAC.cpp">
+      <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\SymmetricKey.cpp">
+      <Filter>Source Files\Key\Symmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\FileStream.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\MemoryStream.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\StreamReader.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\StreamWriter.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Blake2\Blake512.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Blake2\BlakeS256.cpp">
+    <ClCompile Include="..\..\..\Blake2\Blake256.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
   </ItemGroup>

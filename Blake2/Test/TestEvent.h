@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	template <typename ListenerType>
 	class TestEvent

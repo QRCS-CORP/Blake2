@@ -19,6 +19,8 @@ public:
 		HWND console = GetConsoleWindow();
 		GetWindowRect(console, &r);
 		MoveWindow(console, r.left, r.top, 800, 600, TRUE);
+		COORD newSize = { 200, 1000 };
+		SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), newSize);
 #endif
 	}
 

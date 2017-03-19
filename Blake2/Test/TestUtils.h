@@ -13,7 +13,7 @@
 #include <iostream>
 #include <algorithm>
 
-namespace BlakeTest
+namespace TestBlake2
 {
 	class TestUtils
 	{
