@@ -131,7 +131,7 @@ NAMESPACE_DIGEST
 		/// <summary>
 		/// Initialize the MessageHeader structure using a serialized byte array
 		/// </summary>
-		explicit BlakeParams(std::vector<byte> TreeArray)
+		explicit BlakeParams(const std::vector<byte> &TreeArray)
 			:
 			m_dgtLen(0),
 			m_keyLen(0),
