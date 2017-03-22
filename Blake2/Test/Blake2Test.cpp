@@ -35,11 +35,11 @@ namespace TestBlake2
 			OnProgress("These tests compare output between the official C versions and the CEX C++ versions");
 			OnProgress("");
 			Blake2BRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake512Compress random sample comparisons..");
+			OnProgress("Passed 1000 rounds of Blake2B random sample comparisons..");
 			Blake2BPRandomSampleTest();
 			OnProgress("Passed 1000 rounds of Blake2BP random sample comparisons..");
 			Blake2SRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake256Compress random sample comparisons..");
+			OnProgress("Passed 1000 rounds of Blake2S random sample comparisons..");
 			Blake2SPRandomSampleTest();
 			OnProgress("Passed 1000 rounds of Blake2SP random sample comparisons..");/**/
 
@@ -134,7 +134,9 @@ namespace TestBlake2
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Blake512 blake2bp(true);
+					// Note: the official default is 4 threads, my default on all digests is 8 threads
+					BlakeParams params(64, 2, 4, 0, 64);
+					Blake512 blake2bp(params);
 					blake2bp.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
 					blake2bp.Compute(input, hash);
 
@@ -197,7 +199,8 @@ namespace TestBlake2
 			blake2bp_update(S, input.data(), input.size());
 			blake2bp_final(S, hash2.data(), hash2.size());
 
-			Blake512 blake2b(true);
+			BlakeParams params(64, 2, 4, 0, 64);
+			Blake512 blake2b(params);
 			blake2b.Compute(input, hash1);
 
 			if (hash1 != hash2)
@@ -356,11 +359,21 @@ namespace TestBlake2
 
 	void Blake2Test::TreeParamsTest()
 	{
-		BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
+		std::vector<byte> code1(40, 7);
+
+		BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, code1);
 		std::vector<uint8_t> tres = tree1.ToBytes();
 		BlakeParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
+			throw std::string("Blake2STest: Tree parameters test failed!");
+
+		std::vector<byte> code2(12, 3);
+		BlakeParams tree3(32, 32, 2, 1, 32000, 32, 1, 32, code1);
+		tres = tree3.ToBytes();
+		BlakeParams tree4(tres);
+
+		if (!tree3.Equals(tree4))
 			throw std::string("Blake2STest: Tree parameters test failed!");
 	}
 

@@ -110,7 +110,7 @@ private:
 	static const size_t BLOCK_SIZE = 128;
 	static const uint CHAIN_SIZE = 8;
 	static const uint COUNTER_SIZE = 2;
-	static const uint DEF_PRLDEGREE = 4;
+	static const uint DEF_PRLDEGREE = 8;
 	const uint DEF_LEAFSIZE = 16384;
 	const size_t DIGEST_SIZE = 64;
 	const uint FLAG_SIZE = 2;
@@ -228,7 +228,7 @@ public:
 	/// <para>The parameters structure allows for tuning of the internal configuration string,
 	/// and changing the number of threads used by the parallel mechanism (ThreadCount).
 	/// If the ThreadCount is greater than 1, parallel mode (Blake2BP) is instantiated.
-	/// The default threadcount is 4, changing from the default will produce a different output hash code.</para>
+	/// The default threadcount is 8, changing from the default will produce a different output hash code.</para>
 	/// </summary>
 	/// 
 	/// <param name="Params">The BlakeParams structure, containing the tree configuration settings.</param>

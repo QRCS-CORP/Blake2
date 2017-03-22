@@ -150,6 +150,38 @@ void IntUtils::Be64ToBytes(const ulong Value, std::vector<byte> &Output, const s
 #endif
 }
 
+void IntUtils::BeUL256ToBlock(std::vector<uint> &Input, std::vector<byte> &Output, size_t OutOffset)
+{
+#if defined(IS_BIG_ENDIAN)
+	memcpy(&Output[OutOffset], &Input[0], 8 * sizeof(uint));
+#else
+	Be32ToBytes(Input[0], Output, OutOffset);
+	Be32ToBytes(Input[1], Output, OutOffset + 4);
+	Be32ToBytes(Input[2], Output, OutOffset + 8);
+	Be32ToBytes(Input[3], Output, OutOffset + 12);
+	Be32ToBytes(Input[4], Output, OutOffset + 16);
+	Be32ToBytes(Input[5], Output, OutOffset + 20);
+	Be32ToBytes(Input[6], Output, OutOffset + 24);
+	Be32ToBytes(Input[7], Output, OutOffset + 28);
+#endif
+}
+
+void IntUtils::BeULL512ToBlock(std::vector<ulong> &Input, std::vector<byte> &Output, size_t OutOffset)
+{
+#if defined(IS_BIG_ENDIAN)
+	memcpy(&Output[OutOffset], &Input[0], 8 * sizeof(ulong));
+#else
+	Be64ToBytes(Input[0], Output, OutOffset);
+	Be64ToBytes(Input[1], Output, OutOffset + 8);
+	Be64ToBytes(Input[2], Output, OutOffset + 16);
+	Be64ToBytes(Input[3], Output, OutOffset + 24);
+	Be64ToBytes(Input[4], Output, OutOffset + 32);
+	Be64ToBytes(Input[5], Output, OutOffset + 40);
+	Be64ToBytes(Input[6], Output, OutOffset + 48);
+	Be64ToBytes(Input[7], Output, OutOffset + 56);
+#endif
+}
+
 ushort IntUtils::BytesToBe16(const std::vector<byte> &Input, const size_t InOffset)
 {
 #if defined(IS_BIG_ENDIAN)
@@ -948,6 +980,30 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+	}
+}
+
+void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+{
+	if (SimdProfile == SimdProfiles::Simd256)
+	{
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
+	}
+	else if (SimdProfile == SimdProfiles::Simd128)
+	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
+	}
+	else
+	{
+		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];

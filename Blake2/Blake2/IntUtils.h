@@ -270,6 +270,24 @@ public:
 	static void Be64ToBytes(const ulong Value, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
+	/// Convert a Big Endian 8 * 32bit word array to a byte array
+	/// </summary>
+	/// 
+	/// <param name="Input">The 32bit word array</param>
+	/// <param name="Output">The destination bytes</param>
+	/// <param name="OutOffset">OutOffset within the destination block</param>
+	static void BeUL256ToBlock(std::vector<uint> &Input, std::vector<byte> &Output, size_t OutOffset);
+
+	/// <summary>
+	/// Convert a Big Endian 8 * 64bit word array to a byte array
+	/// </summary>
+	/// 
+	/// <param name="Input">The 64bit word array</param>
+	/// <param name="Output">The destination bytes</param>
+	/// <param name="OutOffset">OutOffset within the destination block</param>
+	static void BeULL512ToBlock(std::vector<ulong> &Input, std::vector<byte> &Output, size_t OutOffset);
+
+	/// <summary>
 	/// Convert a byte array to a Big Endian 16 bit word
 	/// </summary>
 	/// 
@@ -975,6 +993,17 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, SimdProfiles SimdProfile);
+
+	/// <summary>
+	/// Block XOR 8 * 32bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	/// <param name="SimdProfile">System supported SIMD instructions</param>
+	static void XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile);
 
 	/// <summary>
 	/// Block XOR 4 * 64bit unsigned integers
