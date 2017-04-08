@@ -39,7 +39,7 @@ private:
 	// 16kb min
 	const size_t DEF_DATACACHE = 16384;
 	// 32mb, not enforced
-	const size_t MAX_PRLALLOC = DEF_DATACACHE * 2000; 
+	const size_t MAX_PRLALLOC = DEF_DATACACHE * 2000;
 
 	bool m_autoInit;
 	size_t m_blockSize;
@@ -50,6 +50,7 @@ private:
 	bool m_isParallel;
 	size_t m_l1DataCacheReserved;
 	size_t m_l1DataCacheTotal;
+	bool m_overrideMaxDegree;
 	size_t m_parallelBlockSize;
 	size_t m_parallelMaxDegree;
 	size_t m_parallelMinimumSize;
@@ -70,7 +71,7 @@ public:
 	/// </summary>
 	const bool IsDefault()
 	{
-		return (m_defaultParams.IsParallel == m_isParallel && 
+		return (m_defaultParams.IsParallel == m_isParallel &&
 			m_defaultParams.MaxDegree == m_parallelMaxDegree &&
 			m_defaultParams.ParallelBlockSize == m_parallelBlockSize);
 	}
@@ -224,18 +225,6 @@ public:
 	void Reset();
 
 	/// <summary>
-	/// Force the SIMD processing profile to a user-defined configuration.
-	/// <para>The type of SIMD pipelining can be forced to either 256bit (AVX2 256), 128bit (SSE3), or None.
-	/// If the calling algorithm uses a variable SIMD profile, (both 128 and 256 byte options are supported), 
-	/// and both options are system ready, the option can be forced down to SSE3, or None, disabling SIMD pipelining.
-	/// The default SIMD profile is the highest supported on the system i.e AVX2->SSE3->None, 
-	/// (though the algorithm may not support that configuration, in which case the algorithm will default to the best configuration, or None is used if overridden).</para>
-	/// </summary>
-	/// 
-	/// <param name="Profile">Select the desired pipelining profile</param>
-	void SetSimdProfile(SimdProfiles Profile);
-
-	/// <summary>
 	/// Define parallel-block and parallel-minimum sizes based on the max number of cores assigned.
 	/// <para>Re-calculates the default recommended option values based on the number of processor cores (threads) assigned to the operation.
 	/// The MaxDegree value is the maximum number of processor cores used by the containing algorithm during parallel operations.
@@ -251,6 +240,7 @@ public:
 	void Detect();
 	void StoreDefaults();
 };
+
 
 NAMESPACE_COMMONEND
 #endif

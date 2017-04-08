@@ -2,14 +2,10 @@
 #define _CEX_INTUTILS_H
 
 #include "CexDomain.h"
-#include "CexDomain.h"
-#include "SimdProfiles.h"
 #include <algorithm>
 #include <sstream>
 
 NAMESPACE_UTILITY
-
-using Enumeration::SimdProfiles;
 
 /// <summary>
 /// An integer utility functions class
@@ -125,7 +121,7 @@ public:
 		return oss.str();
 	}
 
-	// ** Misc Bits ** //
+	//~~~Misc Bits~~~//
 
 	/// <summary>
 	/// Get the bit precision value
@@ -212,6 +208,54 @@ public:
 	/// <returns>The reversed ulong</returns>
 	static ulong ByteReverse(ulong Value);
 
+	/// <summary>
+	/// Convert a byte array to an T size integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// 
+	/// <returns>The return integer</returns>
+	template<typename T>
+	static T BytesToLe(const std::vector<byte> &Input, size_t InOffset)
+	{
+		CEXASSERT(Input.size() - InOffset > 0, "Array too small!");
+
+		size_t inpLen = Input.size() - InOffset;
+		const size_t SHFT = 8;
+		T retNum = static_cast<T>(Input[InOffset]);
+
+		for (size_t i = 1; i < inpLen; ++i)
+			retNum |= static_cast<T>(Input[InOffset + i] << i * SHFT);
+
+		return retNum;
+	}
+
+	/// <summary>
+	/// Convert a T size integer to a byte array
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Length">The number of bytes to copy</param>
+	/// 
+	/// <returns>The return byte array</returns>
+	template<typename T>
+	static std::vector<byte> LeToBytes(T Value, size_t Length)
+	{
+		CEXASSERT(Length > 0, "Array too small!");
+
+		std::vector<byte> retArr(Length);
+		const size_t SHFT = 8;
+
+		retArr[0] = static_cast<byte>(Value);
+
+		for (size_t i = 1; i < Length; ++i)
+			retArr[i] = static_cast<byte>(Value >> i * SHFT);
+
+		return retArr;
+	}
+
 	// Different computer architectures store data using different byte orders. "Big-endian"
 	// means the most significant byte is on the left end of a word. "Little-endian" means the 
 	// most significant byte is on the right end of a word. i.e.: 
@@ -224,6 +268,16 @@ public:
 	/// Run time check for Little Endian byte order
 	/// </summary>
 	static bool IsBigEndian();
+
+	/// <summary>
+	/// Convert a Big Endian N * 8bit word array to a uint32 array.
+	/// <para>The entire input array is copied to 32bit uints, input must be 32bit aligned.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	static void BlockToBe32(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output);
 
 	/// <summary>
 	/// Convert bytes to a Big Endian N bit word
@@ -320,6 +374,26 @@ public:
 	/// Run time check for Little Endian byte order
 	/// </summary>
 	static bool IsLittleEndian();
+
+	/// <summary>
+	/// Convert a Little Endian N * 8bit word array to a uint32 array.
+	/// <para>The entire input array is copied to 32bit uints, input must be 32bit aligned.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	static void BlockToLe32(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output);
+
+	/// <summary>
+	/// Convert a Little Endian N * 32bit word array to a byte array.
+	/// <para>The entire input array is copied to bytes, must be 32bit aligned.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The 32bit word array</param>
+	/// <param name="Output">The destination bytes</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	static void Le32ToBlock(std::vector<uint> &Input, std::vector<byte> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Convert bytes to a Little Endian N bit word
@@ -472,116 +546,6 @@ public:
 	/// <returns>An array of 32 bit words in Little Endian format</returns>
 	static void BytesToLeULL1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
 
-	//~~~Endian Neutral~~~//
-
-	/// <summary>
-	/// Convert a byte array to a system aligned 16 bit word
-	/// </summary>
-	/// 
-	/// <param name="Input">The source byte array</param>
-	/// 
-	/// <returns>A 16 bit word in native Endian format</returns>
-	static ushort BytesToWord16(const std::vector<byte> &Input);
-
-	/// <summary>
-	/// Convert a byte array to a system aligned 16 bit word
-	/// </summary>
-	/// 
-	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">InOffset within the source array</param>
-	///
-	/// <returns>A 16 bit word in native Endian format</returns>
-	static ushort BytesToWord16(const std::vector<byte> &Input, const size_t InOffset);
-
-	/// <summary>
-	/// Convert a byte array to a system aligned 32 bit word
-	/// </summary>
-	/// 
-	/// <param name="Input">The source byte array</param>
-	/// 
-	/// <returns>A 32 bit word in native Endian format</returns>
-	static uint BytesToWord32(const std::vector<byte> &Input);
-
-	/// <summary>
-	/// Convert a byte array to a system aligned 32 bit word
-	/// </summary>
-	/// 
-	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">InOffset within the source array</param>
-	///
-	/// <returns>A 32 bit word in native Endian format</returns>
-	static uint BytesToWord32(const std::vector<byte> &Input, const size_t InOffset);
-
-	/// <summary>
-	/// Convert a byte array to a system aligned 64 bit word
-	/// </summary>
-	/// 
-	/// <param name="Input">The source byte array</param>
-	/// 
-	/// <returns>A 64 bit word in native Endian format</returns>
-	static ulong BytesToWord64(const std::vector<byte> &Input);
-
-	/// <summary>
-	/// Convert a byte array to a system aligned 64 bit word
-	/// </summary>
-	/// 
-	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">InOffset within the source array</param>
-	///
-	/// <returns>A 64 bit word in native Endian format</returns>
-	static ulong BytesToWord64(const std::vector<byte> &Input, const size_t InOffset);
-
-	/// <summary>
-	/// Convert a system aligned Endian 16 bit word to bytes
-	/// </summary>
-	/// 
-	/// <param name="Value">The 16 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	static void Word16ToBytes(const ushort Value, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Convert a system aligned Endian 16 bit word to bytes
-	/// </summary>
-	/// 
-	/// <param name="Value">The 16 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static void Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset);
-
-	/// <summary>
-	/// Convert a system aligned Endian 32 bit word to bytes
-	/// </summary>
-	/// 
-	/// <param name="Value">The 32 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	static void Word32ToBytes(const uint Value, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Convert a system aligned Endian 32 bit word to bytes
-	/// </summary>
-	/// 
-	/// <param name="Value">The 32 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static void Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset);
-
-	/// <summary>
-	/// Convert a system aligned Endian 64 bit word to bytes
-	/// </summary>
-	/// 
-	/// <param name="Value">The 64 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	static void Word64ToBytes(const ulong Value, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Convert a system aligned Endian 64 bit word to bytes
-	/// </summary>
-	/// 
-	/// <param name="Value">The 64 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static void Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset);
-
 	//~~~Miscellaneous and Constant Time~~~//
 
 	/// <summary>
@@ -712,7 +676,8 @@ public:
 	/// Constant time conditional bit copy
 	/// </summary>
 	/// 
-	/// <param name="Value">The destination value</param>
+	/// <param name="Value">The destination mask</param>
+	/// <param name="To">The destination array</param>
 	/// <param name="From0">The first value to copy</param>
 	/// <param name="From1">The second value to copy</param>
 	/// <param name="Length">The number of bits to copy</param>
@@ -726,12 +691,11 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time conditional zeroize memory
+	/// Constant time conditional bit erase
 	/// </summary>
 	/// 
 	/// <param name="Condition">The condition</param>
-	/// <param name="From0">The first value to copy</param>
-	/// <param name="From1">The second value to copy</param>
+	/// <param name="Array">The array to wipe</param>
 	/// <param name="Length">The number of bits to copy</param>
 	template<typename T>
 	static void ConditionalZeroMem(T Condition, T* Array, size_t Length)
@@ -954,24 +918,6 @@ public:
 	/// <returns>The 64 bit integer</returns>
 	static ulong ToInt64(std::vector<byte> Input, size_t InOffset);
 
-	/// <summary>
-	/// Convert an array of 64 bit words into a byte array
-	/// </summary>
-	/// 
-	/// <param name="Input">The input integer array</param>
-	/// <param name="Output">The output byte array</param>
-	static void Word64sToBytes(const std::vector<ulong> &Input, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Convert an array of 64 bit words into a byte array
-	/// </summary>
-	/// 
-	/// <param name="Input">The input integer array</param>
-	/// <param name="InOffset">The input arrays starting offset</param>
-	/// <param name="Length">The number of bytes to return</param>
-	/// <param name="Output">The input integer array</param>
-	static void BytesToWord64s(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &Output);
-
 	//~~~Block XOR~~~//
 
 	/// <summary>
@@ -982,7 +928,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, SimdProfiles SimdProfile);
+	static void XOR128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 32 bytes
@@ -992,7 +938,17 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, SimdProfiles SimdProfile);
+	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
+	/// <summary>
+	/// Block XOR 4 * 32bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void XORUL128(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 8 * 32bit unsigned integers
@@ -1002,8 +958,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 4 * 64bit unsigned integers
@@ -1013,8 +968,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 8 * 64bit unsigned integers
@@ -1024,8 +978,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 16 * 64bit unsigned integers
@@ -1035,8 +988,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// XOR contiguous 16 byte blocks in an array.
@@ -1048,8 +1000,7 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	/// <param name="Length">The number of (16 byte block aligned) bytes to process</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length, SimdProfiles SimdProfile);
+	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 	/// <summary>
 	/// XOR a partial byte block.
@@ -1062,6 +1013,30 @@ public:
 	/// <param name="OutOffset">Offset within the destination array</param>
 	/// <param name="Length">The number of (16 byte block aligned) bytes to process</param>
 	static void XORPRT(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
+
+	/// <summary>
+	/// XOR contiguous 8 * uint32 blocks in an array.
+	/// <para>The array must be evenly aligned to 8 uints</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	/// <param name="Length">The number of (8 uint block aligned) uint32s to process</param>
+	static void XORULBLK(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length);
+
+	/// <summary>
+	/// XOR a partial uint32 block.
+	/// <para>The length should be less than 8 uint32s, otherwise use the parallel methods and process the last block with this (sequential) function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	/// <param name="Length">The number of uint32s to process</param>
+	static void XORULPRT(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length);
 };
 
 NAMESPACE_UTILITYEND

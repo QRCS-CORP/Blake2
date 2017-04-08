@@ -2,6 +2,7 @@
 #define _CEX_DIGESTFROMNAME_H
 
 #include "CexDomain.h"
+#include "CryptoException.h"
 #include "IDigest.h"
 
 NAMESPACE_HELPER

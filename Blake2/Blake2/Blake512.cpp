@@ -11,7 +11,7 @@ using Utility::ArrayUtils;
 using Utility::IntUtils;
 
 
-const static std::vector<ulong> BCIV = { 0x6A09E667F3BCC908UL, 0xBB67AE8584CAA73BUL, 0x3C6EF372FE94F82BUL, 0xA54FF53A5F1D36F1UL, 
+static const std::vector<ulong> BCIV = { 0x6A09E667F3BCC908UL, 0xBB67AE8584CAA73BUL, 0x3C6EF372FE94F82BUL, 0xA54FF53A5F1D36F1UL, 
 	0x510E527FADE682D1UL, 0x9B05688C2B3E6C1FUL, 0x1F83D9ABFB41BD6BUL, 0x5BE0CD19137E2179UL };
 
 
@@ -260,7 +260,7 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			memcpy(&m_msgBuffer[i * BLOCK_SIZE], &mkey[0], mkey.size());
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<byte>(i);
 			LoadState(m_dgtState[i]);
 		}
 		m_msgLength = m_parallelProfile.ParallelMinimumSize();
@@ -308,7 +308,7 @@ void Blake512::Reset()
 	{
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<byte>(i);
 			LoadState(m_dgtState[i]);
 		}
 		m_treeParams.NodeOffset() = 0;
@@ -435,11 +435,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 void Blake512::Compress(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, size_t Length)
 {
 	ArrayUtils::IncreaseLE64(State.T, State.T, Length);
-
-	if (m_parallelProfile.HasSimd128())
-		Blake512Compress::Compress128W(Input, InOffset, State, m_cIV);
-	else
-		Blake512Compress::Compress128(Input, InOffset, State, m_cIV);
+	Blake512Compress::Compress128(Input, InOffset, State, m_cIV);
 }
 
 void Blake512::LoadState(Blake2bState &State)
@@ -448,8 +444,8 @@ void Blake512::LoadState(Blake2bState &State)
 	memset(&State.F[0], 0, FLAG_SIZE * sizeof(ulong));
 	memcpy(&State.H[0], &m_cIV[0], CHAIN_SIZE * sizeof(ulong));
 
-	m_treeParams.GetConfig(m_treeConfig);
-	IntUtils::XORULL512(m_treeConfig, 0, State.H, 0, m_parallelProfile.SimdProfile());
+	m_treeParams.GetConfig<ulong>(m_treeConfig);
+	IntUtils::XORULL512(m_treeConfig, 0, State.H, 0);
 }
 
 void Blake512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, ulong Length)

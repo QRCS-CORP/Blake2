@@ -1,7 +1,5 @@
 #include "IntUtils.h"
-#if defined(CEX_HAS_MINSSE)
-#	include "Intrinsics.h"
-#endif
+#include "Intrinsics.h"
 
 NAMESPACE_UTILITY
 
@@ -103,6 +101,21 @@ ulong IntUtils::ByteReverse(ulong Value)
 	// 6 instructions with rotate instruction, 8 without
 	Value = ((Value & 0xFF00FF00) >> 8) | ((Value & 0x00FF00FF) << 8);
 	return RotFL32(Value, 16U);
+#endif
+}
+
+// ** Big Endian ** //
+
+void IntUtils::BlockToBe32(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output)
+{
+#if defined(IS_BIG_ENDIAN)
+	memcpy(&Output[0], &Input[InOffset], Output.size() * sizeof(uint));
+#else
+	for (size_t i = 0; i < Output.size(); ++i)
+	{
+		Output[i] = IntUtils::BytesToBe32(Input, InOffset);
+		InOffset += 4;
+	}
 #endif
 }
 
@@ -237,6 +250,32 @@ bool IntUtils::IsLittleEndian()
 	return (*(byte *)&num == 1);
 }
 
+void IntUtils::BlockToLe32(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output)
+{
+#if defined(IS_LITTLE_ENDIAN)
+	memcpy(&Output[0], &Input[InOffset], Output.size() * sizeof(uint));
+#else
+	for (size_t i = 0; i < Output.size(); ++i)
+	{
+		Output[i] = IntUtils::BytesToLe32(Input, InOffset);
+		InOffset += 4;
+	}
+#endif
+}
+
+void IntUtils::Le32ToBlock(std::vector<uint> &Input, std::vector<byte> &Output, size_t OutOffset)
+{
+#if defined(IS_LITTLE_ENDIAN)
+	memcpy(&Output[OutOffset], &Input[0], Output.size());
+#else
+	for (size_t i = 0; i < Input.size(); ++i)
+	{
+		IntUtils::Le32ToBytes(Input[i], Output, OutOffset);
+		OutOffset += 4;
+	}
+#endif
+}
+
 void IntUtils::Le16ToBytes(const ushort Value, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if defined(IS_LITTLE_ENDIAN)
@@ -366,8 +405,8 @@ uint IntUtils::BytesToLe32(const std::vector<byte> &Input, const size_t InOffset
 	return
 		(static_cast<uint>(Input[InOffset]) |
 		(static_cast<uint>(Input[InOffset + 1] << 8)) |
-			(static_cast<uint>(Input[InOffset + 2] << 16)) |
-			(static_cast<uint>(Input[InOffset + 3] << 24)));
+		(static_cast<uint>(Input[InOffset + 2] << 16)) |
+		(static_cast<uint>(Input[InOffset + 3] << 24)));
 #endif
 }
 
@@ -465,232 +504,6 @@ void IntUtils::BytesToLeULL1024(const std::vector<byte> &Input, const size_t InO
 	Output[OutOffset + 15] = BytesToLe64(Input, InOffset + 120);
 #endif
 }
-
-#if defined(IS_LITTLE_ENDIAN)
-
-	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input)
-	{
-		return
-			(static_cast<ushort>(Input[0]) |
-			(static_cast<ushort>(Input[1] << 8)));
-	}
-
-	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
-	{
-		return
-			(static_cast<ushort>(Input[InOffset]) |
-			(static_cast<ushort>(Input[InOffset + 1] << 8)));
-	}
-
-	uint IntUtils::BytesToWord32(const std::vector<byte> &Input)
-	{
-		return
-			(static_cast<uint>(Input[0]) |
-			(static_cast<uint>(Input[1] << 8)) |
-			(static_cast<uint>(Input[2] << 16)) |
-			(static_cast<uint>(Input[3] << 24)));
-	}
-
-	uint IntUtils::BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
-	{
-		return
-			(static_cast<uint>(Input[InOffset]) |
-			(static_cast<uint>(Input[InOffset + 1] << 8)) |
-			(static_cast<uint>(Input[InOffset + 2] << 16)) |
-			(static_cast<uint>(Input[InOffset + 3] << 24)));
-	}
-
-	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input)
-	{
-		return
-			((ulong)Input[0]) |
-			((ulong)Input[1] << 8) |
-			((ulong)Input[2] << 16) |
-			((ulong)Input[3] << 24) |
-			((ulong)Input[4] << 32) |
-			((ulong)Input[5] << 40) |
-			((ulong)Input[6] << 48) |
-			((ulong)Input[7] << 56);
-	}
-
-	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
-	{
-		return
-			((ulong)Input[InOffset]) |
-			((ulong)Input[InOffset + 1] << 8) |
-			((ulong)Input[InOffset + 2] << 16) |
-			((ulong)Input[InOffset + 3] << 24) |
-			((ulong)Input[InOffset + 4] << 32) |
-			((ulong)Input[InOffset + 5] << 40) |
-			((ulong)Input[InOffset + 6] << 48) |
-			((ulong)Input[InOffset + 7] << 56);
-	}
-
-	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output)
-	{
-		Output[0] = static_cast<byte>(Value);
-		Output[1] = static_cast<byte>(Value >> 8);
-	}
-
-	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
-	{
-		Output[OutOffset] = static_cast<byte>(Value);
-		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
-	}
-
-	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output)
-	{
-		Output[0] = static_cast<byte>(Value);
-		Output[1] = static_cast<byte>(Value >> 8);
-		Output[2] = static_cast<byte>(Value >> 16);
-		Output[3] = static_cast<byte>(Value >> 24);
-	}
-
-	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
-	{
-		Output[OutOffset] = static_cast<byte>(Value);
-		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
-		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
-		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
-	}
-
-	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output)
-	{
-		Output[0] = static_cast<byte>(Value);
-		Output[1] = static_cast<byte>(Value >> 8);
-		Output[2] = static_cast<byte>(Value >> 16);
-		Output[3] = static_cast<byte>(Value >> 24);
-		Output[4] = static_cast<byte>(Value >> 32);
-		Output[5] = static_cast<byte>(Value >> 40);
-		Output[6] = static_cast<byte>(Value >> 48);
-		Output[7] = static_cast<byte>(Value >> 56);
-	}
-
-	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
-	{
-		Output[OutOffset] = static_cast<byte>(Value);
-		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
-		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
-		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
-		Output[OutOffset + 4] = static_cast<byte>(Value >> 32);
-		Output[OutOffset + 5] = static_cast<byte>(Value >> 40);
-		Output[OutOffset + 6] = static_cast<byte>(Value >> 48);
-		Output[OutOffset + 7] = static_cast<byte>(Value >> 56);
-	}
-
-#else
-
-	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input)
-	{
-		return
-			(static_cast<ushort>(Input[1]) |
-			(static_cast<ushort>(Input[0] << 8)));
-	}
-
-	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
-	{
-		return
-			(static_cast<ushort>(Input[InOffset + 1]) |
-			(static_cast<ushort>(Input[InOffset] << 8)));
-	}
-
-	uint IntUtils::BytesToWord32(const std::vector<byte> &Input)
-	{
-		return
-			(static_cast<uint>(Input[3]) |
-			(static_cast<uint>(Input[2] << 8)) |
-			(static_cast<uint>(Input[1] << 16)) |
-			(static_cast<uint>(Input[0] << 24)));
-	}
-
-	uint IntUtils::BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
-	{
-		return
-			(static_cast<uint>(Input[InOffset + 3]) |
-			(static_cast<uint>(Input[InOffset + 2] << 8)) |
-			(static_cast<uint>(Input[InOffset + 1] << 16)) |
-			(static_cast<uint>(Input[InOffset] << 24)));
-	}
-
-	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input)
-	{
-		return
-			((ulong)Input[7]) |
-			((ulong)Input[6] << 8) |
-			((ulong)Input[5] << 16) |
-			((ulong)Input[4] << 24) |
-			((ulong)Input[3] << 32) |
-			((ulong)Input[2] << 40) |
-			((ulong)Input[1] << 48) |
-			((ulong)Input[0] << 56);
-	}
-
-	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
-	{
-		return
-			((ulong)Input[InOffset + 7]) |
-			((ulong)Input[InOffset + 6] << 8) |
-			((ulong)Input[InOffset + 5] << 16) |
-			((ulong)Input[InOffset + 4] << 24) |
-			((ulong)Input[InOffset + 3] << 32) |
-			((ulong)Input[InOffset + 2] << 40) |
-			((ulong)Input[InOffset + 1] << 48) |
-			((ulong)Input[InOffset] << 56);
-	}
-
-	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output)
-	{
-		Output[1] = static_cast<byte>(Value);
-		Output[0] = static_cast<byte>(Value >> 8);
-	}
-
-	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
-	{
-		Output[OutOffset + 1] = static_cast<byte>(Value);
-		Output[OutOffset] = static_cast<byte>(Value >> 8);
-	}
-
-	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output)
-	{
-		Output[3] = static_cast<byte>(Value);
-		Output[2] = static_cast<byte>(Value >> 8);
-		Output[1] = static_cast<byte>(Value >> 16);
-		Output[0] = static_cast<byte>(Value >> 24);
-	}
-
-	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
-	{
-		Output[OutOffset + 3] = static_cast<byte>(Value);
-		Output[OutOffset + 2] = static_cast<byte>(Value >> 8);
-		Output[OutOffset + 1] = static_cast<byte>(Value >> 16);
-		Output[OutOffset] = static_cast<byte>(Value >> 24);
-	}
-
-	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output)
-	{
-		Output[7] = static_cast<byte>(Value);
-		Output[6] = static_cast<byte>(Value >> 8);
-		Output[5] = static_cast<byte>(Value >> 16);
-		Output[4] = static_cast<byte>(Value >> 24);
-		Output[3] = static_cast<byte>(Value >> 32);
-		Output[2] = static_cast<byte>(Value >> 40);
-		Output[1] = static_cast<byte>(Value >> 48);
-		Output[0] = static_cast<byte>(Value >> 56);
-	}
-
-	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
-	{
-		Output[OutOffset + 7] = static_cast<byte>(Value);
-		Output[OutOffset + 6] = static_cast<byte>(Value >> 8);
-		Output[OutOffset + 5] = static_cast<byte>(Value >> 16);
-		Output[OutOffset + 4] = static_cast<byte>(Value >> 24);
-		Output[OutOffset + 3] = static_cast<byte>(Value >> 32);
-		Output[OutOffset + 2] = static_cast<byte>(Value >> 40);
-		Output[OutOffset + 1] = static_cast<byte>(Value >> 48);
-		Output[OutOffset] = static_cast<byte>(Value >> 56);
-	}
-
-#endif
 
 ulong IntUtils::Crop(ulong Value, uint size)
 {
@@ -901,28 +714,11 @@ ulong IntUtils::ToInt64(std::vector<byte> Input, size_t InOffset)
 	return BytesToLe64(Input, InOffset);
 }
 
-void IntUtils::Word64sToBytes(const std::vector<ulong> &Input, std::vector<byte> &Output)
+void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	if (Output.size() != Input.size() * sizeof(ulong))
-		Output.resize(Input.size() * sizeof(ulong), 0);
-	memcpy(&Output[0], &Input[0], Output.size());
-}
-
-void IntUtils::BytesToWord64s(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &Output)
-{
-	if (Output.size() != (Input.size() - InOffset) * sizeof(ulong))
-		Output.resize(Length / sizeof(ulong));
-	memcpy(&Output[0], &Input[InOffset], Length);
-}
-
-void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, SimdProfiles SimdProfile)
-{
-	if (SimdProfile != SimdProfiles::None)
-	{
-		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
-	}
-	else
-	{
+#if defined(__AVX__)
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -939,22 +735,17 @@ void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vect
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 16]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 16])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 16]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -987,22 +778,29 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORUL128(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX__)
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+#else
+		Output[OutOffset] ^= Input[InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+#endif
+}
+
+void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset)
+{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -1011,45 +809,35 @@ void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::ve
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 2])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 4]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 4])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 4]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 2])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 6]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 6])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 6]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -1058,20 +846,17 @@ void IntUtils::XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 4]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 4])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 4]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 8]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 8])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 8]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 12]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 12])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 12]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 2])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
@@ -1080,9 +865,7 @@ void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std:
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 10]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 10])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 10]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 12]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 12])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 12]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 14]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 14])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 14]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -1099,10 +882,10 @@ void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std:
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length, SimdProfiles SimdProfile)
+void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	const size_t BLOCK16 = 16;
 	const size_t BLOCK32 = 32;
@@ -1112,12 +895,12 @@ void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std
 	{
 		if ((Length - blkCtr) < BLOCK32)
 		{
-			XOR128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			XOR128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
 			blkCtr += BLOCK16;
 		}
 		else
 		{
-			XOR256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			XOR256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
 			blkCtr += BLOCK32;
 		}
 
@@ -1133,6 +916,39 @@ void IntUtils::XORPRT(const std::vector<byte> &Input, const size_t InOffset, std
 		Output[OutOffset + ctr] ^= Input[InOffset + ctr];
 		++ctr;
 	} 
+}
+
+void IntUtils::XORULBLK(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length)
+{
+	const size_t BLOCK4 = 4;
+	const size_t BLOCK8 = 8;
+	size_t blkCtr = 0;
+
+	do
+	{
+		if ((Length - blkCtr) < BLOCK8)
+		{
+			XORUL128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
+			blkCtr += BLOCK4;
+		}
+		else
+		{
+			XORUL256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
+			blkCtr += BLOCK8;
+		}
+	} 
+	while (blkCtr != Length);
+}
+
+void IntUtils::XORULPRT(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length)
+{
+	size_t ctr = 0;
+
+	while (ctr != Length)
+	{
+		Output[OutOffset + ctr] ^= Input[InOffset + ctr];
+		++ctr;
+	}
 }
 
 NAMESPACE_UTILITYEND

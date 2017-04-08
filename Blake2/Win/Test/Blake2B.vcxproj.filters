@@ -28,14 +28,14 @@
     <Filter Include="Source Files\Test\DigestTest">
       <UniqueIdentifier>{284cdecb-018d-4169-a19e-db0e645abe30}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Blake2C">
-      <UniqueIdentifier>{673b062a-5cd1-4dc7-b5c1-aee7d487e0b5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Test\Vectors">
       <UniqueIdentifier>{8ffe9c6a-90b5-4f91-9f96-1c0ec792e368}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Blake2C">
-      <UniqueIdentifier>{535542c3-b341-462e-8e24-a8475d188479}</UniqueIdentifier>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{98128876-5418-4455-9f80-81e5201fcb25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vectors">
+      <UniqueIdentifier>{1905a5f3-bb9f-4d57-8c9d-cd634bc2674e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,44 +72,8 @@
     <ClInclude Include="..\..\Test\CSPRsg.h">
       <Filter>Header Files\Test\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-round.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-load-xop.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse41.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse2.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\Blake2Ref.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2-impl.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\Blake2Diff.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2-config.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\Blake2bX.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2b-round.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse41.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse2.h">
-      <Filter>Header Files\Blake2C</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\BlakeC\blake2.h">
-      <Filter>Header Files\Blake2C</Filter>
+    <ClInclude Include="..\..\Test\TestFiles.h">
+      <Filter>Header Files\Test\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -122,31 +86,28 @@
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2b.c">
-      <Filter>Source Files\Blake2C</Filter>
+    <ClCompile Include="..\..\Test\HexConverter.cpp">
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2bp.c">
-      <Filter>Source Files\Blake2C</Filter>
+    <ClCompile Include="..\..\Test\TestUtils.cpp">
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2s.c">
-      <Filter>Source Files\Blake2C</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\BlakeC\blake2sp.c">
-      <Filter>Source Files\Blake2C</Filter>
+    <ClCompile Include="..\..\Test\ConsoleUtils.cpp">
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Vectors\blake2b-kat.txt">
-      <Filter>Header Files\Test\Vectors</Filter>
-    </Text>
-    <Text Include="Vectors\blake2bp-kat.txt">
-      <Filter>Header Files\Test\Vectors</Filter>
-    </Text>
-    <Text Include="Vectors\blake2s-kat.txt">
-      <Filter>Header Files\Test\Vectors</Filter>
-    </Text>
-    <Text Include="Vectors\blake2sp-kat.txt">
-      <Filter>Header Files\Test\Vectors</Filter>
-    </Text>
+    <Content Include="Vectors\Blake2\blake2sp-kat.txt">
+      <Filter>Vectors</Filter>
+    </Content>
+    <Content Include="Vectors\Blake2\blake2s-kat.txt">
+      <Filter>Vectors</Filter>
+    </Content>
+    <Content Include="Vectors\Blake2\blake2bp-kat.txt">
+      <Filter>Vectors</Filter>
+    </Content>
+    <Content Include="Vectors\Blake2\blake2b-kat.txt">
+      <Filter>Vectors</Filter>
+    </Content>
   </ItemGroup>
 </Project>

@@ -1,11 +1,18 @@
+#include <algorithm>
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <sstream> 
 #include "Blake2Test.h"
 #include "DigestSpeedTest.h"
 #include "ConsoleUtils.h"
 #include "HexConverter.h"
 #include "ITest.h"
+#include "../Blake2/CpuDetect.h"
 
-using namespace TestBlake2;
+using namespace Test;
 
 std::string GetResponse()
 {
@@ -96,7 +103,39 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	RunTest(new Blake2Test());
+
+#if !defined(_OPENMP)
+	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
+	PrintHeader("An error has occurred! Press any key to close..", "");
+	GetResponse();
+	return 0;
+#endif
+
+	CEX::Common::CpuDetect detect;
+
+	if (detect.AVX2())
+	{
+#if !defined(__AVX2__)
+		PrintHeader("Warning! AVX2 support was detected! Set the enhanced instruction set to arch:AVX2 for best performance.");
+#else
+		PrintHeader("AVX2 intrinsics support has been enabled.");
+#endif
+	}
+	else if (detect.AVX())
+	{
+#if defined(__AVX2__)
+		PrintHeader("AVX2 is not supported on this system! AVX intrinsics support is available, set enable enhanced instruction set to arch:AVX");
+#elif !defined(__AVX__)
+		PrintHeader("AVX intrinsics support has been detected, set enhanced instruction set to arch:AVX for best performance.");
+#else
+		PrintHeader("AVX intrinsics support has been enabled.");
+#endif
+	}
+	else
+	{
+		PrintHeader("The minimum SIMD intrinsics support (AVX) was not detected, intrinsics have been disabled!");
+	}
+	PrintHeader("", "");
 
 	try
 	{
@@ -115,50 +154,13 @@ int main()
 
 		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
 		{
-			RunTest(new DigestSpeedTest(0));
+			RunTest(new DigestSpeedTest);
 		}
 		else
 		{
 			ConsoleUtils::WriteLine("Speed test was Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");
-
-
-		if (CanTest("Press 'Y' then Enter to run extended C/C++ version comparison test on 20GB, any other key to cancel: "))
-		{
-			RunTest(new DigestSpeedTest(1));
-		}
-		else
-		{
-			ConsoleUtils::WriteLine("Extended Speed test was Cancelled..");
-		}
-		ConsoleUtils::WriteLine("");
-
-		if (CanTest("Press 'Y' then Enter to run user defined Parallel Degree Test, any other key to cancel: "))
-		{
-			PrintHeader("Enter the Parallel Degree: must be greater than and divisible by 4 (4, 8, 12, 16, 20, 24, 28, 32");
-			int thds = 0;
-			do
-			{
-				std::string resp;
-				std::getline(std::cin, resp);
-				thds = StringToInt(resp);
-				if (thds < 4 || thds % 4 != 0 || thds > 32)
-				{
-					thds = 0;
-					PrintHeader("Enter the Parallel Degree: must be greater than and divisible by 4 (ex 4,8,12,16..");
-				}
-			} 
-			while (thds == 0);
-
-			RunTest(new DigestSpeedTest(thds));
-		}
-		else
-		{
-			ConsoleUtils::WriteLine("Custom Parallel Degree test was Cancelled..");
-		}
-		ConsoleUtils::WriteLine("");
-
 
 		PrintHeader("Completed! Press any key to close..", "");
 		GetResponse();

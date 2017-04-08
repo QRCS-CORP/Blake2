@@ -3,7 +3,7 @@
 
 #include "ITest.h"
 
-namespace TestBlake2
+namespace Test
 {
 	/// <summary>
 	/// Tests the Blake2 digest implementation using vector comparisons.
@@ -13,12 +13,12 @@ namespace TestBlake2
 	class Blake2Test : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Blake Vector KATs; tests Blake 256/512 digests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All Blake tests have executed succesfully.";
-		const std::string DMK_INP = "in:	";
-		const std::string DMK_KEY = "key:	";
-		const std::string DMK_HSH = "hash:	";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
+		static const std::string DMK_INP;
+		static const std::string DMK_KEY;
+		static const std::string DMK_HSH;
 
 		std::vector<std::vector<uint8_t>> m_expected;
 		std::vector<std::vector<uint8_t>> m_message;
@@ -38,16 +38,12 @@ namespace TestBlake2
 		/// <summary>
 		/// Blake2 Vector KATs from the official submission package
 		/// </summary>
-		Blake2Test()
-		{
-		}
+		Blake2Test();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~Blake2Test() 
-		{
-		}
+		~Blake2Test();
 
 		/// <summary>
 		/// Start the tests
@@ -60,12 +56,9 @@ namespace TestBlake2
 		void Blake2BPTest();
 		void Blake2STest();
 		void Blake2SPTest();
-		void Blake2BRandomSampleTest();
-		void Blake2BPRandomSampleTest();
-		void Blake2SRandomSampleTest();
-		void Blake2SPRandomSampleTest();
+		void MacParamsTest();
 		void TreeParamsTest();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 #endif

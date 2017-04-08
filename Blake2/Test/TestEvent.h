@@ -1,10 +1,10 @@
-#ifndef _BLAKE2TEST_TESTEVENT_H
-#define _BLAKE2TEST_TESTEVENT_H
+#ifndef _CEXTEST_TESTEVENT_H
+#define _CEXTEST_TESTEVENT_H
 
 #include <vector>
 #include <iostream>
 
-namespace TestBlake2
+namespace Test
 {
 	template <typename ListenerType>
 	class TestEvent

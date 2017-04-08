@@ -100,6 +100,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,6 +115,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,7 +134,8 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,8 +153,8 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <OpenMPSupport>false</OpenMPSupport>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -171,19 +175,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\BlakeC\blake2-config.h" />
-    <ClInclude Include="..\..\BlakeC\blake2-impl.h" />
-    <ClInclude Include="..\..\BlakeC\blake2.h" />
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse2.h" />
-    <ClInclude Include="..\..\BlakeC\blake2b-load-sse41.h" />
-    <ClInclude Include="..\..\BlakeC\blake2b-round.h" />
-    <ClInclude Include="..\..\BlakeC\Blake2bX.h" />
-    <ClInclude Include="..\..\BlakeC\Blake2Diff.h" />
-    <ClInclude Include="..\..\BlakeC\Blake2Ref.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse2.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-load-sse41.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-load-xop.h" />
-    <ClInclude Include="..\..\BlakeC\blake2s-round.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
@@ -194,30 +185,35 @@
     <ClInclude Include="..\..\Test\TestEvent.h" />
     <ClInclude Include="..\..\Test\TestEventHandler.h" />
     <ClInclude Include="..\..\Test\TestException.h" />
+    <ClInclude Include="..\..\Test\TestFiles.h" />
     <ClInclude Include="..\..\Test\TestUtils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\BlakeC\blake2b.c" />
-    <ClCompile Include="..\..\BlakeC\blake2bp.c" />
-    <ClCompile Include="..\..\BlakeC\blake2s.c" />
-    <ClCompile Include="..\..\BlakeC\blake2sp.c" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
+    <ClCompile Include="..\..\Test\ConsoleUtils.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
+    <ClCompile Include="..\..\Test\HexConverter.cpp" />
     <ClCompile Include="..\..\Test\Test.cpp" />
+    <ClCompile Include="..\..\Test\TestUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Vectors\blake2b-kat.txt" />
-    <Text Include="Vectors\blake2bp-kat.txt" />
-    <Text Include="Vectors\blake2s-kat.txt" />
-    <Text Include="Vectors\blake2sp-kat.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CBlake\CBlake.vcxproj">
-      <Project>{6d04c381-010b-437d-ac13-3f574aeed038}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Static\Blake2\Blake2.vcxproj">
       <Project>{f86bc665-f057-4111-bc21-54180d4c2353}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Vectors\Blake2\blake2b-kat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Vectors\Blake2\blake2bp-kat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Vectors\Blake2\blake2s-kat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Vectors\Blake2\blake2sp-kat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

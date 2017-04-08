@@ -10,7 +10,7 @@ NAMESPACE_DIGEST
 using Utility::IntUtils;
 using Utility::ArrayUtils;
 
-const static std::vector<uint> SCIV = { 0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL };
+static const std::vector<uint> SCIV = { 0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL };
 
 //~~~Constructor~~~//
 
@@ -255,7 +255,7 @@ void Blake256::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			memcpy(&m_msgBuffer[i * BLOCK_SIZE], &mkey[0], mkey.size());
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<byte>(i);
 			LoadState(m_dgtState[i]);
 		}
 		m_msgLength = m_parallelProfile.ParallelMinimumSize();
@@ -309,7 +309,7 @@ void Blake256::Reset()
 	{
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<byte>(i);
 			LoadState(m_dgtState[i]);
 		}
 		m_treeParams.NodeOffset() = 0;
@@ -436,11 +436,7 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 void Blake256::Compress(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, size_t Length)
 {
 	ArrayUtils::IncreaseLE32(State.T, State.T, Length);
-
-	if (m_parallelProfile.HasSimd128())
-		Blake256Compress::Compress64W(Input, InOffset, State, m_cIV);
-	else
-		Blake256Compress::Compress64(Input, InOffset, State, m_cIV);
+	Blake256Compress::Compress64(Input, InOffset, State, m_cIV);
 }
 
 void Blake256::LoadState(Blake2sState &State)
@@ -449,8 +445,8 @@ void Blake256::LoadState(Blake2sState &State)
 	memset(&State.F[0], 0, FLAG_SIZE * sizeof(uint));
 	memcpy(&State.H[0], &m_cIV[0], CHAIN_SIZE * sizeof(uint));
 
-	m_treeParams.GetConfig(m_treeConfig);
-	IntUtils::XORUL256(m_treeConfig, 0, State.H, 0, m_parallelProfile.SimdProfile());
+	m_treeParams.GetConfig<uint>(m_treeConfig);
+	IntUtils::XORUL256(m_treeConfig, 0, State.H, 0);
 }
 
 void Blake256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, ulong Length)

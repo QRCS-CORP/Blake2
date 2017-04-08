@@ -1,18 +1,21 @@
-#ifndef _BLAKE2TEST_ITEST_H
-#define _BLAKE2TEST_ITEST_H
+#ifndef _CEXTEST_ITEST_H
+#define _CEXTEST_ITEST_H
 
 #include "TestCommon.h"
 #include "TestEventHandler.h"
+#include "../Blake2/CexDomain.h"
 
-namespace TestBlake2
+namespace Test
 {
+	using namespace CEX;
+
 	/// <summary>
 	/// Test Interface
 	/// </summary>
 	class ITest
 	{
 	public:
-		// *** Properties *** //
+		//~~~Properties~~~//
 
 		/// <summary>
 		/// Get: The test description
@@ -24,7 +27,7 @@ namespace TestBlake2
 		/// </summary>
 		virtual TestEventHandler &Progress() = 0;
 
-		// *** Constructor *** //
+		//~~~Constructor~~~//
 
 		/// <summary>
 		/// CTor: Initialize this class
@@ -36,7 +39,7 @@ namespace TestBlake2
 		/// </summary>
 		virtual ~ITest() {}
 
-		// *** Public Methods *** //
+		//~~~Public Methods~~~//
 
 		/// <summary>
 		/// Start the test

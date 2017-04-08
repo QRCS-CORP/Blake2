@@ -1,65 +1,73 @@
 #include "Blake2Test.h"
-#include <fstream>
-#include <string.h>
 #include "HexConverter.h"
-#include "CSPRsg.h"
-
+#include "../Blake2/CSP.h"
 #include "../Blake2/Blake256.h"
 #include "../Blake2/Blake512.h"
-#include "../BlakeC/blake2.h"
-#include "../Blake2/HMAC.h"
 #include "../Blake2/SymmetricKey.h"
+#include "TestFiles.h"
+#include <fstream>
+#include <string>
 
-namespace TestBlake2
+namespace Test
 {
-	using namespace CEX::Digest;
-	using CEX::Key::Symmetric::SymmetricKey;
+	using Digest::BlakeParams;
+	using Digest::Blake256;
+	using Digest::Blake512;
+	using namespace TestFiles::Blake2Kat;
+
+	const std::string Blake2Test::DESCRIPTION = "Blake Vector KATs; tests Blake2 256/512 digests.";
+	const std::string Blake2Test::FAILURE = "FAILURE! ";
+	const std::string Blake2Test::SUCCESS = "SUCCESS! All Blake tests have executed succesfully.";
+	const std::string Blake2Test::DMK_INP = "in:	";
+	const std::string Blake2Test::DMK_KEY = "key:	";
+	const std::string Blake2Test::DMK_HSH = "hash:	";
+
+	Blake2Test::Blake2Test()
+		:
+		m_expected(0),
+		m_message(0),
+		m_progressEvent()
+	{
+	}
+
+	Blake2Test::~Blake2Test()
+	{
+	}
 
 	std::string Blake2Test::Run()
 	{
 		try
 		{
 			TreeParamsTest();
-			OnProgress("Passed BlakeParams parameter serialization test..");
+			OnProgress(std::string("Passed Blake2Params parameter serialization test.."));
+			MacParamsTest();
+			OnProgress(std::string("Passed SymmetricKey cloning test.."));
 			Blake2STest();
-			OnProgress("Passed Blake2-S 256 vector tests..");
+			OnProgress(std::string("Passed Blake2-S 256 vector tests.."));
 			Blake2SPTest();
-			OnProgress("Passed Blake2-SP 256 vector tests..");
+			OnProgress(std::string("Passed Blake2-SP 256 vector tests.."));
 			Blake2BTest();
-			OnProgress("Passed Blake2-B 512 vector tests..");
+			OnProgress(std::string("Passed Blake2-B 512 vector tests.."));
 			Blake2BPTest();
-			OnProgress("Passed Blake2-BP 512 vector tests..");    
-			OnProgress("");/**/
-
-			OnProgress("Each algorithm is tested 1000 times with pseudo random message arrays");
-			OnProgress("These tests compare output between the official C versions and the CEX C++ versions");
-			OnProgress("");
-			Blake2BRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake2B random sample comparisons..");
-			Blake2BPRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake2BP random sample comparisons..");
-			Blake2SRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake2S random sample comparisons..");
-			Blake2SPRandomSampleTest();
-			OnProgress("Passed 1000 rounds of Blake2SP random sample comparisons..");/**/
+			OnProgress(std::string("Passed Blake2-BP 512 vector tests.."));    
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 
 	void Blake2Test::Blake2BTest()
 	{
-		std::ifstream stream("Vectors/blake2b-kat.txt");
+		std::ifstream stream(BLAKE2BKAT);
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2b-kat.txt");
 
 		std::string line;
 
@@ -88,12 +96,13 @@ namespace TestBlake2
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
+					Key::Symmetric::SymmetricKey mkey(key);
 					Blake512 blake2b(false);
-					blake2b.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					blake2b.Initialize(mkey);
 					blake2b.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2BTest: KAT test has failed!");
+						throw TestException("Blake2BTest: KAT test has failed!");
 				}
 			}
 		}
@@ -102,9 +111,9 @@ namespace TestBlake2
 
 	void Blake2Test::Blake2BPTest()
 	{
-		std::ifstream stream("Vectors/blake2bp-kat.txt");
+		std::ifstream stream(BLAKE2BPKAT);
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2bp-kat.txt");
 
 		std::string line;
 
@@ -137,82 +146,25 @@ namespace TestBlake2
 					// Note: the official default is 4 threads, my default on all digests is 8 threads
 					BlakeParams params(64, 2, 4, 0, 64);
 					Blake512 blake2bp(params);
-					blake2bp.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					Key::Symmetric::SymmetricKey mkey(key);
+					// hard code for test
+					blake2bp.ParallelProfile().SetMaxDegree(4);
+					blake2bp.Initialize(mkey);
 					blake2bp.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2BPTest: KAT test has failed!");
+						throw TestException("Blake2BPTest: KAT test has failed!");
 				}
 			}
 		}
 		stream.close();
 	}
 
-	void Blake2Test::Blake2BRandomSampleTest()
-	{
-		CSPRsg rnd;
-		std::vector<uint8_t> hash1(64);
-		std::vector<uint8_t> hash2(64);
-		blake2b_state S[1];
-
-		for (size_t i = 0; i < 1000; ++i)
-		{
-			uint16_t blkSize = 0;
-			// get a random block size
-			memcpy(&blkSize, &rnd.GetBytes(2)[0], 2);
-			if (blkSize == 0)
-				++blkSize;
-			// get p-rand
-			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
-
-			Blake512 blake2b(false);
-			blake2b.Compute(input, hash1);
-
-			blake2b_init(S, 64);
-			blake2b_update(S, input.data(), input.size());
-			blake2b_final(S, hash2.data(), hash2.size());
-
-			if (hash1 != hash2)
-				throw std::string("Blake2BTest: Random sample test has failed!");
-		}
-	}
-
-	void Blake2Test::Blake2BPRandomSampleTest()
-	{
-		CSPRsg rnd;
-		std::vector<uint8_t> hash1(64);
-		std::vector<uint8_t> hash2(64);
-		blake2bp_state S[1];
-		std::vector<uint8_t> key(64);
-
-		for (size_t i = 0; i < 1000; ++i)
-		{
-			uint16_t blkSize = 0;
-			// get a random block size
-			memcpy(&blkSize, &rnd.GetBytes(2)[0], 2);
-			if (blkSize == 0)
-				++blkSize;
-			// get p-rand
-			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
-
-			blake2bp_init(S, 64);
-			blake2bp_update(S, input.data(), input.size());
-			blake2bp_final(S, hash2.data(), hash2.size());
-
-			BlakeParams params(64, 2, 4, 0, 64);
-			Blake512 blake2b(params);
-			blake2b.Compute(input, hash1);
-
-			if (hash1 != hash2)
-				throw std::string("Blake2BPTest: Random sample test has failed!");
-		}
-	}
-
 	void Blake2Test::Blake2STest()
 	{
-		std::ifstream stream("Vectors/blake2s-kat.txt");
+		std::ifstream stream(BLAKE2SKAT);
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2s-kat.txt");
 
 		std::string line;
 
@@ -241,12 +193,13 @@ namespace TestBlake2
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
+					Key::Symmetric::SymmetricKey mkey(key);
 					Blake256 blake2s(false);
-					blake2s.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					blake2s.Initialize(mkey);
 					blake2s.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2STest: KAT test has failed!");
+						throw TestException("Blake2STest: KAT test has failed!");
 				}
 			}
 		}
@@ -255,9 +208,9 @@ namespace TestBlake2
 
 	void Blake2Test::Blake2SPTest()
 	{
-		std::ifstream stream("Vectors/blake2sp-kat.txt");
+		std::ifstream stream(BLAKE2SPKAT);
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2sp-kat.txt");
 
 		std::string line;
 
@@ -286,75 +239,32 @@ namespace TestBlake2
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
+					Key::Symmetric::SymmetricKey mkey(key);
 					Blake256 blake2sp(true);
-					blake2sp.Initialize(CEX::Key::Symmetric::SymmetricKey(key));
+					// hard code for test
+					blake2sp.ParallelProfile().SetMaxDegree(8);
+					blake2sp.Initialize(mkey);
 					blake2sp.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2SPTest: KAT test has failed!");
+						throw TestException("Blake2SPTest: KAT test has failed!");
 				}
 			}
 		}
 		stream.close();
 	}
 
-	void Blake2Test::Blake2SRandomSampleTest()
+	void Blake2Test::MacParamsTest()
 	{
-		CSPRsg rnd;
-		std::vector<uint8_t> hash1(32);
-		std::vector<uint8_t> hash2(32);
-		blake2s_state S[1];
+		std::vector<uint8_t> key(64);
+		for (uint8_t i = 0; i < key.size(); ++i)
+			key[i] = i;
 
-		for (size_t i = 0; i < 1000; ++i)
-		{
-			uint16_t blkSize = 0;
-			// get a random block size
-			memcpy(&blkSize, &rnd.GetBytes(2)[0], 2);
-			if (blkSize == 0)
-				++blkSize;
-			// get p-rand
-			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
+		Key::Symmetric::SymmetricKey mkey(key, key, key);
+		Key::Symmetric::ISymmetricKey* mkey2 = mkey.Clone();
 
-			Blake256 blake2s(false);
-			blake2s.Compute(input, hash1);
-
-			blake2s_init(S, 32);
-			blake2s_update(S, input.data(), input.size());
-			blake2s_final(S, hash2.data(), hash2.size());
-
-			if (hash1 != hash2)
-				throw std::string("Blake2STest: Random sample test has failed!");
-		}
-	}
-
-	void Blake2Test::Blake2SPRandomSampleTest()
-	{
-		CSPRsg rnd;
-		std::vector<uint8_t> hash1(32);
-		std::vector<uint8_t> hash2(32);
-		blake2sp_state S[1];
-		std::vector<uint8_t> key(32);
-
-		for (size_t i = 0; i < 1000; ++i)
-		{
-			uint16_t blkSize = 0;
-			// get a random block size
-			memcpy(&blkSize, &rnd.GetBytes(2)[0], 2);
-			if (blkSize == 0)
-				++blkSize;
-			// get p-rand
-			std::vector<uint8_t> input = rnd.GetBytes(blkSize);
-
-			Blake256 blake2s(true);
-			blake2s.Compute(input, hash1);
-
-			blake2sp_init(S, 32);
-			blake2sp_update(S, input.data(), input.size());
-			blake2sp_final(S, hash2.data(), hash2.size());
-
-			if (hash1 != hash2)
-				throw std::string("Blake2SPTest: Random sample test has failed!");
-		}
+		if (!mkey.Equals(*mkey2))
+			throw TestException("Blake2STest: Mac parameters test failed!");
 	}
 
 	void Blake2Test::TreeParamsTest()
@@ -377,7 +287,7 @@ namespace TestBlake2
 			throw std::string("Blake2STest: Tree parameters test failed!");
 	}
 
-	void Blake2Test::OnProgress(char* Data)
+	void Blake2Test::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}
