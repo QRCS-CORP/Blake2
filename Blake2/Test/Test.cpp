@@ -10,6 +10,8 @@
 #include "ConsoleUtils.h"
 #include "HexConverter.h"
 #include "ITest.h"
+#include "TestFiles.h"
+#include "TestUtils.h"
 #include "../Blake2/CpuDetect.h"
 
 using namespace Test;
@@ -110,6 +112,25 @@ int main()
 	GetResponse();
 	return 0;
 #endif
+
+	std::string data("");
+	try
+	{
+		TestUtils::Read(TestFiles::Blake2Kat::BLAKE2BKAT, data);
+	}
+	catch (...)
+	{
+		data = "";
+	}
+
+	if (data.size() == 0)
+	{
+		PrintHeader("Warning! Could not find the cipher test vector KAT files!");
+		PrintHeader("The Win/Test/Vectors folder must be in the executables path.", "");
+		PrintHeader("An error has occurred! Press any key to close..", "");
+		GetResponse();
+		return 0;
+	}
 
 	CEX::Common::CpuDetect detect;
 

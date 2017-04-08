@@ -67,7 +67,7 @@ namespace Test
 	{
 		std::ifstream stream(BLAKE2BKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2b-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2BKAT);
 
 		std::string line;
 
@@ -113,7 +113,7 @@ namespace Test
 	{
 		std::ifstream stream(BLAKE2BPKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2bp-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2BPKAT);
 
 		std::string line;
 
@@ -164,7 +164,7 @@ namespace Test
 	{
 		std::ifstream stream(BLAKE2SKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2s-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2SKAT);
 
 		std::string line;
 
@@ -210,7 +210,7 @@ namespace Test
 	{
 		std::ifstream stream(BLAKE2SPKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2sp-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2SPKAT);
 
 		std::string line;
 
